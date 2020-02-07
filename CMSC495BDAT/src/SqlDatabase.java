@@ -1,6 +1,6 @@
 /* File:    SqlDatabase.java
    Author:  Steven Rutter
-   Data:    6 February 2020
+   Date:    6 February 2020
    Purpose: Provide an interface for SQLite3. */
 
 /* Public methods:
@@ -49,16 +49,6 @@ public class SqlDatabase
     {
         String url = "jdbc:sqlite:" + name + ".db";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return 1;
-        }
-
-        /* Create table to store the dataset in, using provided columns. */
         String sql = "CREATE TABLE IF NOT EXISTS dataset (";
 
         for (int i = 0; i < columns.length; i++) {
@@ -69,9 +59,9 @@ public class SqlDatabase
 
         sql += ");";
 
-        try (Connection conn = DriverManager.getConnection(url);
-
-        Statement stmt = conn.createStatement()) {
+        try {
+            Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -89,15 +79,6 @@ public class SqlDatabase
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return 1;
-        }
-
         String sql = "INSERT INTO dataset VALUES (";
 
         for (int i = 0; i < values.length; i++) {
@@ -108,9 +89,9 @@ public class SqlDatabase
 
         sql += ");";
 
-        try (Connection conn = DriverManager.getConnection(url);
-
-        Statement stmt = conn.createStatement()) {
+        try {
+            Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -123,41 +104,25 @@ public class SqlDatabase
     /* getColumnsDatabase - return column names for active database. */
     public String[] getColumnDatabase()
     {
-        ResultSet rs = null;
         String[] columns = {};
 
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
-
-        String sql = "SELECT group_concat(name, '|') ";
-        sql += "FROM pragma_table_info('dataset');";
-
         try {
             Connection conn = DriverManager.getConnection(url);
+
+            String sql = "SELECT group_concat(name, '|') ";
+            sql += "FROM pragma_table_info('dataset');";
+
             Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
+            ResultSet rs = stmt.executeQuery(sql);
 
-        try {
-            while (rs.next()) {
+            while (rs.next())
                 columns = rs.getString(1).split("\\|", -1);
-            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }
-
 
         return columns;
     }
@@ -165,34 +130,17 @@ public class SqlDatabase
     /* getValuesAllDatabase - returns all values for column in database. */
     ArrayList<Double> getValuesAllDatabase(String column)
     {
-        ResultSet rs = null;
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
-
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
-
         String sql = "SELECT " + column + " FROM dataset;";
 
         try {
             Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
+            ResultSet rs = stmt.executeQuery(sql);
 
-        try {
-            while (rs.next()) {
+            while (rs.next())
                 values.add(rs.getDouble(column));
-            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -203,20 +151,11 @@ public class SqlDatabase
 
     /* getValuesRangeDatabase - returns all values for column in database within
         the specified range (inclusive). */
-    ArrayList<Double> getValuesRangeDatabase(String column, double lower, double upper)
+    ArrayList<Double> getValuesRangeDatabase(String column, double lower,
+            double upper)
     {
-        ResultSet rs = null;
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
-
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
 
         String sql = "SELECT " + column + " FROM dataset ";
         sql += "WHERE " + column + " >= " + lower;
@@ -225,16 +164,10 @@ public class SqlDatabase
         try {
             Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
+            ResultSet rs = stmt.executeQuery(sql);
 
-        try {
-            while (rs.next()) {
+            while (rs.next())
                 values.add(rs.getDouble(column));
-            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -247,18 +180,8 @@ public class SqlDatabase
         are less than specified value with boolean inclusive flag. */
     ArrayList<Double> getValuesLessDatabase(String column, double value, boolean inclusive)
     {
-        ResultSet rs = null;
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
-
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
 
         String sql = "SELECT " + column + " FROM dataset ";
 
@@ -270,16 +193,10 @@ public class SqlDatabase
         try {
             Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
+            ResultSet rs = stmt.executeQuery(sql);
 
-        try {
-            while (rs.next()) {
+            while (rs.next())
                 values.add(rs.getDouble(column));
-            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -292,18 +209,8 @@ public class SqlDatabase
         are greater than specified value with boolean inclusive flag. */
     ArrayList<Double> getValuesGreaterDatabase(String column, double value, boolean inclusive)
     {
-        ResultSet rs = null;
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
-
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
 
         String sql = "SELECT " + column + " FROM dataset ";
 
@@ -315,16 +222,10 @@ public class SqlDatabase
         try {
             Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
+            ResultSet rs = stmt.executeQuery(sql);
 
-        try {
-            while (rs.next()) {
+            while (rs.next())
                 values.add(rs.getDouble(column));
-            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -347,9 +248,8 @@ public class SqlDatabase
 
         names = directory.list(filter);
 
-        for (int i = 0; i < names.length; i++) {
+        for (int i = 0; i < names.length; i++)
             names[i] = names[i].substring(0, names[i].lastIndexOf('.'));
-        }
 
         return names;
     }

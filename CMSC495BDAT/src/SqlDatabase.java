@@ -1,7 +1,7 @@
 /* File:    SqlDatabase.java
    Author:  Steven Rutter
    Date:    6 February 2020
-   Purpose: Provide an interface for SQLite3. */
+   Purpose: Provide a class for interating with SQLite3. */
 
 /* Public methods:
        SqlDatabase()

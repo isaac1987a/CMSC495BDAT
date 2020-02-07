@@ -4,10 +4,10 @@
    Purpose: Provide an interface for SQLite3. */
 
 /* Public methods:
-       public SqlDatabase()
-       public int createDatabase(String name, String[] columns)
-       public int insertDatabase(double[] values)
-       public String[] getColumnDatabase()
+       SqlDatabase()
+       int createDatabase(String name, String[] columns)
+       int insertDatabase(double[] values)
+       String[] getColumnDatabase()
        ArrayList<Double> getValuesAllDatabase(String column)
        ArrayList<Double> getValuesRangeDatabase(String column, double lower,
                double upper)

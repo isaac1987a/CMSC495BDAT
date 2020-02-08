@@ -1,8 +1,8 @@
 /*  File: InputOutput.java
     Author: Adam Rittermann
     Date: 7 February 2020
-    Purpose:  CSV Parser. Passes values to SQL for storage. Returns
-            Min/Max values for each column. */
+    Purpose:  CSV Parser. Passes values to SQL for storage. Returns String[]
+            containing "Column Min-Max" for each column. */
 
 /* Public Methods
     parseFile(File file, String dbName);

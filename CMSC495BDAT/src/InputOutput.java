@@ -67,7 +67,7 @@ public class InputOutput {
             }
 
             // Create Database Instance
-            db.createDatabase(dbName, headers.length);
+            db.createDatabase(dbName, headers);
 
             /*
             Convert Additional Rows to Double values and insert into Database.

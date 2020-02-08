@@ -76,7 +76,7 @@ public class InputOutput {
             while ((line = fileReader.readLine()) != null) {
                 double[] columns = Arrays.stream(line.split(DELIMITER)).mapToDouble(Double::parseDouble).toArray();
                 db.insertDatabase(columns);
-                findMinAndMax(columns);
+                calculateMinAndMax(columns);
             }
             
         } catch (FileNotFoundException e) {
@@ -105,7 +105,7 @@ public class InputOutput {
      *
      * @param columns double[] containing current row of values
      */
-    private void findMinAndMax(double[] columns) {
+    private void calculateMinAndMax(double[] columns) {
 
         for (int i = 0; i < columns.length; i++) {
 

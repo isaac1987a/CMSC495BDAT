@@ -8,6 +8,7 @@
        int createDatabase(String name, String[] columns)
        int insertDatabase(double[] values)
        String[] getColumnDatabase()
+       ArrayList<ArrayList<Double>> exportDatabase()
        ArrayList<Double> getValuesAllDatabase(String column)
        ArrayList<Double> getValuesRangeDatabase(String column, double lower,
                double upper)
@@ -141,6 +142,53 @@ public class SqlDatabase
 
             while (rs.next())
                 values.add(rs.getDouble(column));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+
+        return values;
+    }
+
+    /* exportDatabase - return two-dimensional array list of entire dataset. */
+    ArrayList<ArrayList<Double>> exportDatabase()
+    {
+        ResultSet rs = null;
+        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        ArrayList<ArrayList<Double>> values = new ArrayList<>();
+       String[] columns = getColumnDatabase();
+
+        try (Connection conn = DriverManager.getConnection(url)) {
+            if (conn != null) {
+                DatabaseMetaData meta = conn.getMetaData();
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+
+        String sql = "SELECT * FROM dataset;";
+
+        try {
+            Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+
+        try {
+            int i = 0;
+
+            while (rs.next()) {
+                values.add(new ArrayList<Double>());
+
+                for (int j = 0; j < columns.length; j++)
+                    values.get(i).add(rs.getDouble(columns[j]));
+
+                i++;
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);

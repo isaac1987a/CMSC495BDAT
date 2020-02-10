@@ -20,9 +20,9 @@ import java.util.Arrays;
 public class InputOutput {
 
     // parseFile Variables
-    private String[] parseInfo;
-    private BufferedReader fileReader;
+    private BufferedReader fileReader; 
     private final String DELIMITER = ",";
+    private String[] parseInfo;
     private String[] headers;
     private int count;
 

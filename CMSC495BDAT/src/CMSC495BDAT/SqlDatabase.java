@@ -1,4 +1,5 @@
 package CMSC495BDAT;
+
 /* File:    SqlDatabase.java
    Author:  Steven Rutter
    Date:    6 February 2020
@@ -28,12 +29,14 @@ import java.io.IOException;
 import java.lang.System;
 import java.nio.file.*; 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Vector;
+
+import GUIObjects.SQLParameters;
 
 public class SqlDatabase
 {
@@ -129,15 +132,58 @@ public class SqlDatabase
         return columns;
     }
 
-    /* getValuesDatabase -
-    ArrayList<Double> getValuesDatabase(String column,
-            ArrayList<SQLParameters> params)
+    /* getValuesDatabase - get all values for column with provided params. */
+    Vector<Double> getValuesDatabase(String column,
+            Vector<SQLParameters> params)
     {
-        ArrayList<Double> values = new ArrayList<Double>();
+        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        Vector<Double> values = new Vector<Double>();
+        String sql = "SELECT " + column + " FROM dataset WHERE ";
+        
+        for (int i = 0; i < params.size(); i++) {
+        	SQLParameters param = params.get(i);
+        	if (param.valid) {
+        		sql += param.columnName + " ";
+        		
+        		switch (param.operator) {
+        			case "gt":
+        				sql += "> " + param.value;
+        				break;
+        			case "ge":
+        				sql += ">= " + param.value;
+        				break;
+        			case "e":
+        				sql += "= " + param.value;
+        				break;
+        			case "le":
+        				sql += "<= " + param.value;
+        				break;
+        			case "lt":
+        				sql += "< " + param.value;
+        				break;
+        		}
+        		
+        		if (i < params.size() - 1)
+        			sql += " AND ";
+        		else
+        			sql += ";";
+        	}
+        }
+        	
+        try {
+            Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next())
+                values.add(rs.getDouble(column));
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
 
         return values;
     }
-    */
 
     /* getValuesAllDatabase - returns all values for column in database. */
     ArrayList<Double> getValuesAllDatabase(String column)

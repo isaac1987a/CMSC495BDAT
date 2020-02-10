@@ -129,6 +129,16 @@ public class SqlDatabase
         return columns;
     }
 
+    /* getValuesDatabase -
+    ArrayList<Double> getValuesDatabase(String column,
+            ArrayList<SQLParameters> params)
+    {
+        ArrayList<Double> values = new ArrayList<Double>();
+
+        return values;
+    }
+    */
+
     /* getValuesAllDatabase - returns all values for column in database. */
     ArrayList<Double> getValuesAllDatabase(String column)
     {
@@ -154,32 +164,16 @@ public class SqlDatabase
     /* exportDatabase - return two-dimensional array list of entire dataset. */
     ArrayList<ArrayList<Double>> exportDatabase()
     {
-        ResultSet rs = null;
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
-        ArrayList<ArrayList<Double>> values = new ArrayList<>();
-       String[] columns = getColumnDatabase();
-
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
-
         String sql = "SELECT * FROM dataset;";
+        ArrayList<ArrayList<Double>> values = new ArrayList<>();
+        String[] columns = getColumnDatabase();
 
         try {
             Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
+            ResultSet rs = stmt.executeQuery(sql);
 
-        try {
             int i = 0;
 
             while (rs.next()) {

@@ -1,3 +1,4 @@
+package CMSC495BDAT;
 /* File:    SqlDatabase.java
    Author:  Steven Rutter
    Date:    6 February 2020

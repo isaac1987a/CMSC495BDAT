@@ -1,3 +1,4 @@
+package CMSC495BDAT;
 /*  File: InputOutput.java
     Author: Adam Rittermann
     Date: 9 February 2020
@@ -69,7 +70,7 @@ public class InputOutput {
 
             // Create Database Instance
             SqlDatabase db = new SqlDatabase();
-            db.createDatabase(dbName, headers.length);
+            db.createDatabase(dbName, headers);
 
             /*
             Convert Additional Rows to Double values and insert into Database.
@@ -129,7 +130,7 @@ public class InputOutput {
      *
      * @param dbName Name of Database to be Stored
      */
-    private void setCurrentDatabase(String dbName) {
+    public void setCurrentDatabase(String dbName) {
         try (PrintWriter pw = new PrintWriter("DBName.txt")) {
             pw.println(dbName);
         } catch (FileNotFoundException fnf) {

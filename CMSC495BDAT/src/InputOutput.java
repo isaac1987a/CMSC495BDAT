@@ -1,18 +1,20 @@
 /*  File: InputOutput.java
     Author: Adam Rittermann
-    Date: 7 February 2020
-    Purpose:  CSV Parser. Passes values to SQL for storage. Returns String[]
-            containing "Column Min-Max" for each column. */
+    Date: 9 February 2020
+    Purpose:  CSV Parser. Passes values to SQL for storage. Returns
+            Min/Max values for each column. Stores current DB Name
+            for Last State Load */
 
-/* Public Methods
-    parseFile(File file, String dbName);
-*/
-
+ /* Public Methods
+    parseFile(File file, String dbName): String[] parseInfo;
+    getCurrentDatabase(): String dbName;
+ */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 public class InputOutput {
@@ -28,7 +30,6 @@ public class InputOutput {
     private double[] minValues;
     private double[] maxValues;
 
-    // CSV Array
     /**
      * Parses the chosen CSV file, identifies min & max for each column, and
      * sends data to the SQL Database
@@ -41,12 +42,10 @@ public class InputOutput {
     public String[] parseFile(File file, String dbName) {
 
         try {
+
             String line;
             count = 0;
             fileReader = new BufferedReader(new FileReader(file));
-
-            // Create Database Instance
-            SqlDatabase db = new SqlDatabase();
 
             // Read First Row of CSV as Headers
             line = fileReader.readLine();
@@ -63,11 +62,14 @@ public class InputOutput {
             for (int i = 0; i < headers.length; i++) {
                 minValues[i] = Double.MAX_VALUE;
                 maxValues[i] = 0;
-
             }
 
+            // Save Current Chosen Database Name in File for Last State Load
+            this.setCurrentDatabase(dbName);
+
             // Create Database Instance
-            db.createDatabase(dbName, headers);
+            SqlDatabase db = new SqlDatabase();
+            db.createDatabase(dbName, headers.length);
 
             /*
             Convert Additional Rows to Double values and insert into Database.
@@ -76,21 +78,20 @@ public class InputOutput {
             while ((line = fileReader.readLine()) != null) {
                 double[] columns = Arrays.stream(line.split(DELIMITER)).mapToDouble(Double::parseDouble).toArray();
                 db.insertDatabase(columns);
-                calculateMinAndMax(columns);
+                this.getMinAndMax(columns);
             }
-            
+
         } catch (FileNotFoundException e) {
             System.out.println("ERROR: File Not Found.");
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
         }
-        
+
         for (int i = 0; i < headers.length; i++) {
             parseInfo[count] = headers[i] + " " + minValues[i] + "-" + maxValues[i];
             count++;
         }
 
-        
         /* --------------- FOR TESTING --------------- */
         System.out.println("Min Values: " + Arrays.toString(minValues));
         System.out.println("Max Values: " + Arrays.toString(maxValues));
@@ -105,7 +106,7 @@ public class InputOutput {
      *
      * @param columns double[] containing current row of values
      */
-    private void calculateMinAndMax(double[] columns) {
+    private void getMinAndMax(double[] columns) {
 
         for (int i = 0; i < columns.length; i++) {
 
@@ -121,5 +122,39 @@ public class InputOutput {
                 minValues[i] = currentValue;
             }
         }
+    }
+
+    /**
+     * Saves DBName to a Text File for Last State Load
+     *
+     * @param dbName Name of Database to be Stored
+     */
+    private void setCurrentDatabase(String dbName) {
+        try (PrintWriter pw = new PrintWriter("DBName.txt")) {
+            pw.println(dbName);
+        } catch (FileNotFoundException fnf) {
+            System.out.println("ERROR: " + fnf);
+        }
+    }
+
+    /**
+     * Reads Stored DBName from Text File for Last State Load
+     *
+     * @return dbName If File Exists, null if File Does Not Exist
+     */
+    public String getCurrentDatabase() {
+
+        // Pull Previous DB Name from Text File if Exists
+        try {
+            fileReader = new BufferedReader(new FileReader("DBName.txt"));
+            String dbName = fileReader.readLine();
+            return dbName;
+        } catch (FileNotFoundException fnf) {
+            System.out.println("ERROR: " + fnf);
+        } catch (IOException ioe) {
+            System.out.println("ERROR: " + ioe);
+        }
+        // Return Null if File not Found
+        return null;
     }
 }

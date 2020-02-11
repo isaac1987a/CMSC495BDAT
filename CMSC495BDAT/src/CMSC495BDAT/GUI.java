@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -12,6 +13,10 @@ import GUIObjects.SearchType;
 import javafx.stage.FileChooser;
 
 public class GUI extends JFrame implements ActionListener{
+	JMenuBar menuBar;
+	JMenu menu;
+	JMenuItem loadDB;
+	
 	private Vector <SearchType> searchTypes = new Vector<SearchType>();
 	private String[] types = {"Tabular"};  //Types of displays
 	private JComboBox<String> searchSelectorBox=new JComboBox<String>(types);
@@ -28,7 +33,26 @@ public class GUI extends JFrame implements ActionListener{
 		//Set Window Size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setSize(screenSize.height/2,screenSize.width/3);
+		
+		//Add menu
+		menuBar=new JMenuBar();
+		menu=new JMenu("File");
+		loadDB=new JMenuItem("Load DB");
+		
+		
+		//add Panels
 		add(searchPanel);
+		
+		//add MenuBar
+		this.setJMenuBar(menuBar);
+		menuBar.add(menu);
+		menu.add(loadDB);
+		loadDB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				dbSelectionMenu();
+			}
+		});
+		
 		searchPanel.setLayout(new GridLayout(6, 1));
 		searchPanel.add(searchSelectorBox);
 		//test data
@@ -53,7 +77,7 @@ public class GUI extends JFrame implements ActionListener{
 
 	}
 	//pre GUI commands
-	/*private void startup() {
+	private void startup() {
 		//check for previously used DB and load
 		if (io.getCurrentDatabase()==null) {
 			db.selectDatabase(io.getCurrentDatabase());
@@ -65,7 +89,9 @@ public class GUI extends JFrame implements ActionListener{
 	//create menu to select or create DB
 	private void dbSelectionMenu() {
 		JFrame dbSelectFrame = new JFrame();
-		dbSelectFrame.setLayout(new BoxLayout(dbSelectFrame, BoxLayout.Y_AXIS));
+		JPanel dbSelectionPanel=new JPanel();
+		dbSelectFrame.add(dbSelectionPanel);
+		dbSelectionPanel.setLayout(new BoxLayout(dbSelectionPanel, BoxLayout.Y_AXIS));
 		
 		//Get current DB list and select current DB
 		JComboBox dbList=new JComboBox(db.listDatabase());
@@ -107,12 +133,12 @@ public class GUI extends JFrame implements ActionListener{
 		});
 		
 		//add Objects to GUI
-		dbSelectFrame.add(dbList);
-		dbSelectFrame.add(accept);
-		dbSelectFrame.add(addDB);
-		dbSelectFrame.add(nameBox);
+		dbSelectionPanel.add(dbList);
+		dbSelectionPanel.add(accept);
+		dbSelectionPanel.add(addDB);
+		dbSelectionPanel.add(nameBox);
 		dbSelectFrame.setVisible(true);
-	}*/
+	}
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
@@ -130,8 +156,19 @@ public class GUI extends JFrame implements ActionListener{
 		//Generate Data and Send to Tabular View
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Tabular")) {
 			searchTypes.get(0).prepare();
-			//TabularView chart = new TabularView(displayFrame, db.getColumnDatabase(), db.getValuesDatabase(searchTypes.get(0).discriminators));
-		
+			
+			//Convert Search arraylist to double array
+			ArrayList <ArrayList <Double>> tmpVector = db.exportDatabase();
+			double[][] dataList= new double[tmpVector.size()][tmpVector.get(0).size()];
+			for (int i=0; i<tmpVector.size(); i++) {
+				double[] tmp1DArray = new double[tmpVector.get(0).size()];
+				for (int j=0; j<tmpVector.get(0).size(); j++) {
+					tmp1DArray[j]=tmpVector.get(i).get(j).doubleValue();
+				}
+				dataList[i]= tmp1DArray;
+			}
+			//execute the search
+			TabularView chart = new TabularView(displayFrame, dataList, db.getColumnDatabase());
 		}
 		//Prep Search Discriminators
 		//Select Search Type

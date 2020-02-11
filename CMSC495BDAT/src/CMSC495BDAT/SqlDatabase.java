@@ -146,19 +146,19 @@ public class SqlDatabase
         		sql += param.columnName + " ";
         		
         		switch (param.operator) {
-        			case "gt":
+        			case ">":
         				sql += "> " + param.value;
         				break;
-        			case "ge":
+        			case ">=":
         				sql += ">= " + param.value;
         				break;
-        			case "e":
+        			case "=":
         				sql += "= " + param.value;
         				break;
-        			case "le":
+        			case "<=":
         				sql += "<= " + param.value;
         				break;
-        			case "lt":
+        			case "<":
         				sql += "< " + param.value;
         				break;
         		}

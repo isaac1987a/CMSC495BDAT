@@ -19,7 +19,7 @@ public class SQLParameters extends JPanel{
 	
 	//Create GUI Elements
 	private JComboBox<String> columnSelection;
-	private String[] discriminatorString= {"gt", "ge", "e", "le", "lt"};
+	private String[] discriminatorString= {">", ">=", "=", "<=", "<"};
 	private JComboBox<String> discriminator = new JComboBox<String>(discriminatorString);
 	private JTextField entryField=new JTextField();
 	private JButton addButton;

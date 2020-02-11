@@ -127,7 +127,7 @@ public class TabularView extends JFrame {
 
 
   /** Display panel with fake data for testing purposes. */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
     System.out.println("TEST MODE: Launch TabularView window with test data");
 
     JFrame testFrame = new JFrame();
@@ -150,7 +150,7 @@ public class TabularView extends JFrame {
 
     TabularView myView = new TabularView(testFrame, testData);
     
-	}
+	}*/
 
 }
 

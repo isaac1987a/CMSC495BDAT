@@ -1,7 +1,7 @@
 package CMSC495BDAT;
 /*  File: InputOutput.java
     Author: Adam Rittermann
-    Date: 9 February 2020
+    Date: 10 February 2020
     Purpose:  CSV Parser. Passes values to SQL for storage. Returns
             Min/Max values for each column. Stores current DB Name
             for Last State Load */
@@ -9,7 +9,9 @@ package CMSC495BDAT;
  /* Public Methods
     parseFile(File file, String dbName): String[] parseInfo;
     getCurrentDatabase(): String dbName;
+    setCurrentDatabase(String dbName): void;
  */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -139,7 +141,8 @@ public class InputOutput {
     }
 
     /**
-     * Reads Stored DBName from Text File for Last State Load
+     * Reads Stored DBName from Text File for Last State Load. Creates Empty
+     * DBName.txt if no Database has been Loaded.
      *
      * @return dbName If File Exists, null if File Does Not Exist
      */
@@ -151,7 +154,8 @@ public class InputOutput {
             String dbName = fileReader.readLine();
             return dbName;
         } catch (FileNotFoundException fnf) {
-            System.out.println("ERROR: " + fnf);
+            System.out.println("ERROR: DBName.txt not found. Creating File...");
+            this.setCurrentDatabase("");
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
         }

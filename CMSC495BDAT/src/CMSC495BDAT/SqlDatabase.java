@@ -10,6 +10,8 @@ package CMSC495BDAT;
        int createDatabase(String name, String[] columns)
        int insertDatabase(double[] values)
        String[] getColumnDatabase()
+       double[] getValuesDatabase(String column,
+               Vector<SQLParameters> params)
        ArrayList<ArrayList<Double>> exportDatabase()
        ArrayList<Double> getValuesAllDatabase(String column)
        ArrayList<Double> getValuesRangeDatabase(String column, double lower,
@@ -133,11 +135,10 @@ public class SqlDatabase
     }
 
     /* getValuesDatabase - get all values for column with provided params. */
-    Vector<Double> getValuesDatabase(String column,
-            Vector<SQLParameters> params)
+    double[] getValuesDatabase(String column, Vector<SQLParameters> params)
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
-        Vector<Double> values = new Vector<Double>();
+        ArrayList<Double> retValues = new ArrayList<Double>();
         String sql = "SELECT " + column + " FROM dataset WHERE ";
         
         for (int i = 0; i < params.size(); i++) {
@@ -175,13 +176,19 @@ public class SqlDatabase
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
 
-            while (rs.next())
-                values.add(rs.getDouble(column));
+            while (rs.next()) {
+                retValues.add(rs.getDouble(column));
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }
 
+        double[] values = new double[retValues.size()];
+
+        for (int i = 0; i < retValues.size(); i++)
+        	values[i] = retValues.get(i);
+        
         return values;
     }
 

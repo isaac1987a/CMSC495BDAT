@@ -18,7 +18,7 @@ public class SearchType extends JPanel{
 	private JButton colorChooser2;
 	private JButton addButton;
 	private JButton delButton;
-	public Vector <SQLParameters> discriminators;
+	private Vector <SQLParameters> discriminators;
 	public SearchType(String[] colums, int layerNumber , String option) {
 		setLayout(new GridLayout(2,2));
 		add(createSearchBar(0 , option));
@@ -62,5 +62,8 @@ public class SearchType extends JPanel{
 		for (int i=0; i<discriminators.size(); i++) {
 			discriminators.get(i).prepare();
 		}
+	}
+	public Vector <SQLParameters> getSQLParameters() {
+		return discriminators;
 	}
 }

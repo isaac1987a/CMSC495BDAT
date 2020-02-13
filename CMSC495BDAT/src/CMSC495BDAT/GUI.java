@@ -26,7 +26,7 @@ public class GUI extends JFrame implements ActionListener{
 	private String[] columnNames;
 	private SqlDatabase db = new SqlDatabase();
 	public GUI() {
-		//startup();
+		startup();
 		
 		//Create Window
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,9 +56,8 @@ public class GUI extends JFrame implements ActionListener{
 		searchPanel.setLayout(new GridLayout(6, 1));
 		searchPanel.add(searchSelectorBox);
 		//test data
-		String[] testSrings = {"Apple", "Bunny", "Coyote"};
 		for (int i=0; i<1; i++) {
-			searchTypes.add(new SearchType(testSrings, 0, "Nowhere"));
+			searchTypes.add(new SearchType(columnNames, 0, "Nowhere"));
 		}
 		for (int i=0; i<searchTypes.size(); i++) {
 			searchPanel.add(searchTypes.get(i));
@@ -79,8 +78,9 @@ public class GUI extends JFrame implements ActionListener{
 	//pre GUI commands
 	private void startup() {
 		//check for previously used DB and load
-		if (io.getCurrentDatabase()==null) {
+		if (!(io.getCurrentDatabase()==null)) {
 			db.selectDatabase(io.getCurrentDatabase());
+			columnNames=db.getColumnDatabase();
 		}
 		else {
 			dbSelectionMenu();
@@ -111,9 +111,9 @@ public class GUI extends JFrame implements ActionListener{
 		JButton addDB = new JButton("New DB");
 		addDB.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
 			//check for invalid DB Names
-			if (nameBox.getText()==null||nameBox.getText().equals("")||nameBox.getText().equals("DB Name")||nameBox.getText().matches("[A-Za-z][A-Za-z0-9]+"))
+			if (nameBox.getText()==null||nameBox.getText().equals("")||nameBox.getText().equals("DB Name")||!nameBox.getText().matches("[A-Za-z][A-Za-z0-9]+")) {
 				return;
-			
+			}
 			//File Selection
 			File csvFile;
 			File DBName;
@@ -156,7 +156,7 @@ public class GUI extends JFrame implements ActionListener{
 		//Generate Data and Send to Tabular View
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Tabular")) {
 			searchTypes.get(0).prepare();
-			
+			/*
 			//Convert Search arraylist to double array
 			ArrayList <ArrayList <Double>> tmpVector = db.exportDatabase();
 			double[][] dataList= new double[tmpVector.size()][tmpVector.get(0).size()];
@@ -166,9 +166,9 @@ public class GUI extends JFrame implements ActionListener{
 					tmp1DArray[j]=tmpVector.get(i).get(j).doubleValue();
 				}
 				dataList[i]= tmp1DArray;
-			}
+			}*/
 			//execute the search
-			TabularView chart = new TabularView(displayFrame, dataList, db.getColumnDatabase());
+			TabularView chart = new TabularView(displayFrame, db.getValuesDatabase(searchTypes.get(0).getSQLParameters()), db.getColumnDatabase());
 		}
 		//Prep Search Discriminators
 		//Select Search Type
@@ -176,5 +176,4 @@ public class GUI extends JFrame implements ActionListener{
 		//Send to Display Layer
 		
 	}
-	
 }

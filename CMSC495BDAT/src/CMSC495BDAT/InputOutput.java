@@ -156,6 +156,7 @@ public class InputOutput {
         } catch (FileNotFoundException fnf) {
             System.out.println("ERROR: DBName.txt not found. Creating File...");
             this.setCurrentDatabase("");
+            return null;
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
         }

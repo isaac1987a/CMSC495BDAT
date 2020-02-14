@@ -177,8 +177,6 @@ public class SqlDatabase
         				sql += ";";
         			}
         		}
-        		
-        		
         	}
         }
         	
@@ -248,10 +246,17 @@ public class SqlDatabase
         				break;
         		}
         		
-        		if (i < params.size() - 1)
-        			sql += " AND ";
-        		else
-        			sql += ";";
+        		if (i < params.size() - 1) {
+        			if (params.get(i + 1).valid) {
+        				if ((i < params.size() - 1) && (params.size() != 1)) {
+            				sql += " AND ";
+        				} else {
+            				sql += ";";		
+        				}
+        			} else {
+        				sql += ";";
+        			}
+        		}
         	}
         }
         	

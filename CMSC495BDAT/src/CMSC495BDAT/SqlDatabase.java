@@ -144,6 +144,7 @@ public class SqlDatabase
         
         for (int i = 0; i < params.size(); i++) {
         	SQLParameters param = params.get(i);
+
         	if (param.valid) {
         		sql += param.columnName + " ";
         		
@@ -165,10 +166,19 @@ public class SqlDatabase
         				break;
         		}
         		
-        		if (i < params.size() - 1)
-        			sql += " AND ";
-        		else
-        			sql += ";";
+        		if (i < params.size() - 1) {
+        			if (params.get(i + 1).valid) {
+        				if ((i < params.size() - 1) && (params.size() != 1)) {
+            				sql += " AND ";
+        				} else {
+            				sql += ";";		
+        				}
+        			} else {
+        				sql += ";";
+        			}
+        		}
+        		
+        		
         	}
         }
         	

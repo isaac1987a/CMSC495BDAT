@@ -165,21 +165,19 @@ public class SqlDatabase
         				sql += "< " + param.value;
         				break;
         		}
-        		
+
         		if (i < params.size() - 1) {
         			if (params.get(i + 1).valid) {
-        				if ((i < params.size() - 1) && (params.size() != 1)) {
-            				sql += " AND ";
-        				} else {
-            				sql += ";";		
-        				}
-        			} else {
-        				sql += ";";
+            			sql += " AND ";
         			}
+        		}
+        	} else {
+        		if ((i < params.size() - 1) && (params.get(i + 1).valid)) {
+        			sql += " AND ";
         		}
         	}
         }
-        	
+                	
         try {
             Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
@@ -245,17 +243,15 @@ public class SqlDatabase
         				sql += "< " + param.value;
         				break;
         		}
-        		
+
         		if (i < params.size() - 1) {
         			if (params.get(i + 1).valid) {
-        				if ((i < params.size() - 1) && (params.size() != 1)) {
-            				sql += " AND ";
-        				} else {
-            				sql += ";";		
-        				}
-        			} else {
-        				sql += ";";
+            			sql += " AND ";
         			}
+        		}
+        	} else {
+        		if ((i < params.size() - 1) && (params.get(i + 1).valid)) {
+        			sql += " AND ";
         		}
         	}
         }

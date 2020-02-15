@@ -14,9 +14,11 @@ package CMSC495BDAT;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
@@ -48,8 +50,14 @@ public class InputOutput {
 
             String line;
             count = 0;
-            fileReader = new BufferedReader(new FileReader(file));
+            fileReader = new BufferedReader(new InputStreamReader(
+            		new FileInputStream(file), "UTF-8"));
 
+            /* Get rid of UTF-8 BOM issue for bug #2. -sdr */
+            fileReader.mark(1);
+            if (fileReader.read() != 0xFEFF)
+              fileReader.reset();
+            
             // Read First Row of CSV as Headers
             line = fileReader.readLine();
             headers = line.split(DELIMITER);

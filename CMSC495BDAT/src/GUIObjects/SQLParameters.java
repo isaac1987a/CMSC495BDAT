@@ -53,7 +53,7 @@ public class SQLParameters extends JPanel{
 		String tmpStr=entryField.getText();
 		
 		//Check for edge case of "" in value field
-		if (entryField.getText().equals("")){
+		if (entryField.getText().equals("")||entryField.getText()==null){
 			entryField.setBackground(Color.WHITE);
 			valid=false;
 			return;

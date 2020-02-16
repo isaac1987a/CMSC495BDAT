@@ -1,4 +1,5 @@
 package CMSC495BDAT;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.*;
+
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.IO;
 
 import GUIObjects.SearchType;
 import javafx.stage.FileChooser;
@@ -23,13 +26,22 @@ public class GUI extends JFrame implements ActionListener{
 	private JPanel searchPanel=new JPanel();
 	private JButton searchButton= new JButton("Search");
 	private InputOutput io = new InputOutput();
-	private String[] columnNames;
+	private String[] columnNames= {""};
 	private SqlDatabase db = new SqlDatabase();
 	public GUI() {
 		startup();
 		
 		//Create Window
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+	}
+	private void createMainWindow() {
+		
+		//Reset Everything
+		searchPanel.removeAll();
+		searchPanel=new JPanel();
+		searchTypes = new Vector<SearchType>();
+		
 		//Set Window Size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setSize(screenSize.height/2,screenSize.width/3);
@@ -78,9 +90,10 @@ public class GUI extends JFrame implements ActionListener{
 	//pre GUI commands
 	private void startup() {
 		//check for previously used DB and load
-		if (!(io.getCurrentDatabase()==null)) {
+		if (!(io.getCurrentDatabase()==null||(!io.getCurrentDatabase().matches("[A-Za-z][A-Za-z0-9]+")))) {
 			db.selectDatabase(io.getCurrentDatabase());
 			columnNames=db.getColumnDatabase();
+			createMainWindow();
 		}
 		else {
 			dbSelectionMenu();
@@ -88,18 +101,21 @@ public class GUI extends JFrame implements ActionListener{
 	}
 	//create menu to select or create DB
 	private void dbSelectionMenu() {
-		JFrame dbSelectFrame = new JFrame();
+		JFrame dbSelectFrame = new JFrame("Select DB");
+		dbSelectFrame.setSize(200, 300);
 		JPanel dbSelectionPanel=new JPanel();
 		dbSelectFrame.add(dbSelectionPanel);
 		dbSelectionPanel.setLayout(new BoxLayout(dbSelectionPanel, BoxLayout.Y_AXIS));
 		
+
 		//Get current DB list and select current DB
 		JComboBox dbList=new JComboBox(db.listDatabase());
 		JButton accept=new JButton("Select DB");
 		accept.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
-	    db.selectDatabase(String.valueOf(dbList.getSelectedItem()));
-	    io.setCurrentDatabase(String.valueOf(dbList.getSelectedItem()));
-	    columnNames=db.getColumnDatabase();
+			db.selectDatabase(String.valueOf(dbList.getSelectedItem()));
+			io.setCurrentDatabase(String.valueOf(dbList.getSelectedItem()));
+			columnNames=db.getColumnDatabase();
+			createMainWindow();
 		}
 		});
 		
@@ -112,11 +128,11 @@ public class GUI extends JFrame implements ActionListener{
 		addDB.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
 			//check for invalid DB Names
 			if (nameBox.getText()==null||nameBox.getText().equals("")||nameBox.getText().equals("DB Name")||!nameBox.getText().matches("[A-Za-z][A-Za-z0-9]+")) {
+				nameBox.setBackground(Color.RED);
 				return;
 			}
 			//File Selection
 			File csvFile;
-			File DBName;
 			final JFileChooser fc = new JFileChooser();
 			int returnVal = fc.showOpenDialog(dbSelectFrame);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -128,7 +144,9 @@ public class GUI extends JFrame implements ActionListener{
 			
 			//Parse File and set DB Names
 			io.parseFile(csvFile, nameBox.getText());
+			db.selectDatabase(io.getCurrentDatabase());
 			columnNames=db.getColumnDatabase();
+			createMainWindow();
 		}
 		});
 		

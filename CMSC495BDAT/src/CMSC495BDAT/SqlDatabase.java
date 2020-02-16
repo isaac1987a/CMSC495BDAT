@@ -122,14 +122,13 @@ public class SqlDatabase
             sql += "FROM pragma_table_info('dataset');";
 
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-
+            ResultSet rs = stmt.executeQuery(sql);            	
             while (rs.next())
                 columns = rs.getString(1).split("\\|", -1);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
-        }
+        } 
 
         return columns;
     }

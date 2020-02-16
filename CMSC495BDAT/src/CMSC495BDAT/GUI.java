@@ -1,3 +1,9 @@
+/*Gui
+ * By Isaac Blach
+ * Creates Core GUI and calls other classes to perform various functions
+ */
+
+
 package CMSC495BDAT;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,7 +25,7 @@ public class GUI extends JFrame implements ActionListener{
 	JMenuBar menuBar;
 	JMenu menu;
 	JMenuItem loadDB;
-	
+	//Create GUI objects
 	private Vector <SearchType> searchTypes = new Vector<SearchType>();
 	private String[] types = {"Tabular"};  //Types of displays
 	private JComboBox<String> searchSelectorBox=new JComboBox<String>(types);
@@ -35,6 +41,7 @@ public class GUI extends JFrame implements ActionListener{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
+	//Create main window.  Separated into it's own class to 
 	private void createMainWindow() {
 		
 		//Reset Everything

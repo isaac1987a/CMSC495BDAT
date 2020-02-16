@@ -1,3 +1,9 @@
+/*
+ * SQLParameters
+ * By Isaac Blach
+ * Used to display search parameters to send to the SQL DB.
+ */
+
 package GUIObjects;
 
 import java.awt.Color;

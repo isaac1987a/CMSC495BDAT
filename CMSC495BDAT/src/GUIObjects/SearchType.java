@@ -1,3 +1,9 @@
+/*
+ * SearchType
+ * By Isaac Blach
+ * Displays and stores data about the desired graph.  Contains Vector of SQLParameters
+ */
+
 package GUIObjects;
 
 import java.awt.Color;

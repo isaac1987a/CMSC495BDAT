@@ -49,9 +49,13 @@ public class SqlDatabase
     {
         this.currentDatabaseName = "";
     }
-
+    
     /* createDatabase - create a new database with specified columns.
-        Returns 0 if there are no errors, else returns 1. */
+     * 
+     * @param name The name of the database
+     * @param columns Column names
+     * @return 1 if error, else 0
+     */
     public int createDatabase(String name, String[] columns)
     {
         String url = "jdbc:sqlite:" + name + ".db";
@@ -81,7 +85,10 @@ public class SqlDatabase
     }
 
     /* insertDatabase - insert a row into active database with specified values.
-        Returns 0 if there are no errors, else returns 1. */
+     * 
+     * @param values The values to be inserted as a new row
+     * @return 1 if error, else 0
+     */
     public int insertDatabase(double[] values)
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
@@ -108,7 +115,10 @@ public class SqlDatabase
         return 0;
     }
 
-    /* getColumnsDatabase - return column names for active database. */
+    /* getColumnsDatabase - return column names for active database.
+     * 
+     * @return Column names
+     */
     public String[] getColumnDatabase()
     {
         String[] columns = {};
@@ -122,7 +132,8 @@ public class SqlDatabase
             sql += "FROM pragma_table_info('dataset');";
 
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);            	
+            ResultSet rs = stmt.executeQuery(sql);     
+            
             while (rs.next())
                 columns = rs.getString(1).split("\\|", -1);
         } catch (SQLException e) {
@@ -133,7 +144,11 @@ public class SqlDatabase
         return columns;
     }
     
-    /* getValuesDatabase - get all values with provided params. */
+    /* getValuesDatabase - get all values with provided params.
+     * 
+     * @param params Vector of SQLParameters for SELECT
+     * @return Matching values from database matching params
+     */
     double[][] getValuesDatabase(Vector<SQLParameters> params)
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
@@ -213,7 +228,12 @@ public class SqlDatabase
         return values;	
     }
 
-    /* getValuesDatabase - get all values for column with provided params. */
+    /* getValuesDatabase - get all values for column with provided params.
+     * 
+     * @param column Column name
+     * @param params Vector of SQLParamter parameters for SELECT
+     * @return Matching values from the database
+     */
     double[] getValuesDatabase(String column, Vector<SQLParameters> params)
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
@@ -276,7 +296,11 @@ public class SqlDatabase
         return values;
     }
 
-    /* getValuesAllDatabase - returns all values for column in database. */
+    /* getValuesAllDatabase - returns all values for column in database.
+     * 
+     * @param column Column name
+     * @return All values from the active database
+     */
     ArrayList<Double> getValuesAllDatabase(String column)
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
@@ -298,7 +322,10 @@ public class SqlDatabase
         return values;
     }
 
-    /* exportDatabase - return two-dimensional array list of entire dataset. */
+    /* exportDatabase - return two-dimensional array list of entire dataset.
+     * 
+     * @return Entire database as a 2D ArrayList
+     */
     ArrayList<ArrayList<Double>> exportDatabase()
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
@@ -330,7 +357,13 @@ public class SqlDatabase
     }
 
     /* getValuesRangeDatabase - returns all values for column in database within
-        the specified range (inclusive). */
+     * the specified range (inclusive).
+     * 
+     * @param column Column name
+     * @param lower Lower limit for value (inclusive)
+     * @param upper Upper limit for value (inclusive)
+     * @return All values in database for column, within range
+     */
     ArrayList<Double> getValuesRangeDatabase(String column, double lower,
             double upper)
     {
@@ -357,7 +390,13 @@ public class SqlDatabase
     }
 
     /* getValuesLessDatabase - returns all values for column in database which
-        are less than specified value with boolean inclusive flag. */
+     * are less than specified value with boolean inclusive flag.
+     * 
+     * @param column Column name
+     * @param value Less than value
+     * @param Boolean flag to indicate inclusive
+     * @return All values for column in the active database less than value
+     */
     ArrayList<Double> getValuesLessDatabase(String column, double value, boolean inclusive)
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
@@ -386,7 +425,13 @@ public class SqlDatabase
     }
 
     /* getValuesGreaterDatabase - returns all values for column in database which
-        are greater than specified value with boolean inclusive flag. */
+        are greater than specified value with boolean inclusive flag.
+     * 
+     * @param column Column name
+     * @param value Greater than value
+     * @param inclusive Flag indicating inclusive
+     * @return 1 if error, else 0
+     */
     ArrayList<Double> getValuesGreaterDatabase(String column, double value, boolean inclusive)
     {
         String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
@@ -414,7 +459,10 @@ public class SqlDatabase
         return values;
     }
 
-    /* listDatabase - returns a list of all databases. */
+    /* listDatabase - returns a list of all databases.
+     * 
+     * @return Array of database names
+     */
     String[] listDatabase()
     {
         String[] names;
@@ -434,13 +482,21 @@ public class SqlDatabase
         return names;
     }
     
+    /* currentDatabase - get name of the active database.
+     * 
+     * @return The active database name
+     */
     String currentDatabase()
     {
     	return this.currentDatabaseName;
     }
 
     /* selectDatabase - selects active database as specified. Returns 0 if
-        successful, else returns 1. */
+     * successful, else returns 1.
+     * 
+     * @param name Name of database
+     * @return 1 if error, else 0
+     */
     int selectDatabase(String name)
     {
         File dbFile = new File(name + ".db");
@@ -454,7 +510,11 @@ public class SqlDatabase
     }
 
     /* deleteDatabase - deletes active database as specified. Returns 0 if
-        successful, else returns 1. */
+     * successful, else returns 1.
+     * 
+     * @param name The name of the database to delete
+     * @return 1 if error, else 0
+     */
     int deleteDatabase(String name)
     {
         try {

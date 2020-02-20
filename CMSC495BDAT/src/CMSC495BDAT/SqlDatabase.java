@@ -58,7 +58,7 @@ public class SqlDatabase
      */
     public int createDatabase(String name, String[] columns)
     {
-        String url = "jdbc:sqlite:" + name + ".db";
+        String url = "jdbc:sqlite:" + name + File.separator + name + ".db";
 
         String sql = "CREATE TABLE IF NOT EXISTS dataset (";
 
@@ -69,6 +69,11 @@ public class SqlDatabase
         }
 
         sql += ");";
+        
+        File dir = new File(name);
+        
+        if (!dir.exists())
+        	dir.mkdirs();
 
         try {
             Connection conn = DriverManager.getConnection(url);
@@ -91,7 +96,8 @@ public class SqlDatabase
      */
     public int insertDatabase(double[] values)
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
 
         String sql = "INSERT INTO dataset VALUES (";
 
@@ -123,7 +129,8 @@ public class SqlDatabase
     {
         String[] columns = {};
 
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
 
         try {
             Connection conn = DriverManager.getConnection(url);
@@ -151,7 +158,8 @@ public class SqlDatabase
      */
     double[][] getValuesDatabase(Vector<SQLParameters> params)
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
         ArrayList<ArrayList<Double>> retValues = new ArrayList<>();
         String[] columns = getColumnDatabase();
         String sql = "SELECT * FROM dataset WHERE ";
@@ -236,7 +244,8 @@ public class SqlDatabase
      */
     double[] getValuesDatabase(String column, Vector<SQLParameters> params)
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
         ArrayList<Double> retValues = new ArrayList<Double>();
         String sql = "SELECT " + column + " FROM dataset WHERE ";
         
@@ -303,7 +312,8 @@ public class SqlDatabase
      */
     ArrayList<Double> getValuesAllDatabase(String column)
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
         String sql = "SELECT " + column + " FROM dataset;";
 
@@ -328,7 +338,8 @@ public class SqlDatabase
      */
     ArrayList<ArrayList<Double>> exportDatabase()
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
         String sql = "SELECT * FROM dataset;";
         ArrayList<ArrayList<Double>> values = new ArrayList<>();
         String[] columns = getColumnDatabase();
@@ -367,7 +378,8 @@ public class SqlDatabase
     ArrayList<Double> getValuesRangeDatabase(String column, double lower,
             double upper)
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
 
         String sql = "SELECT " + column + " FROM dataset ";
@@ -399,7 +411,8 @@ public class SqlDatabase
      */
     ArrayList<Double> getValuesLessDatabase(String column, double value, boolean inclusive)
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
 
         String sql = "SELECT " + column + " FROM dataset ";
@@ -434,7 +447,8 @@ public class SqlDatabase
      */
     ArrayList<Double> getValuesGreaterDatabase(String column, double value, boolean inclusive)
     {
-        String url = "jdbc:sqlite:" + currentDatabaseName + ".db";
+        String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
+        		currentDatabaseName + ".db";
         ArrayList<Double> values = new ArrayList<Double>();
 
         String sql = "SELECT " + column + " FROM dataset ";
@@ -462,6 +476,8 @@ public class SqlDatabase
     /* listDatabase - returns a list of all databases.
      * 
      * @return Array of database names
+     * 
+     * TODO: currently broken - need to search for databases in subdirectories.
      */
     String[] listDatabase()
     {
@@ -499,7 +515,7 @@ public class SqlDatabase
      */
     int selectDatabase(String name)
     {
-        File dbFile = new File(name + ".db");
+        File dbFile = new File(name + File.separator + name + ".db");
 
         if (dbFile.exists()) {
             this.currentDatabaseName = name;
@@ -518,7 +534,7 @@ public class SqlDatabase
     int deleteDatabase(String name)
     {
         try {
-            Files.deleteIfExists(Paths.get(name + ".db"));
+            Files.deleteIfExists(Paths.get(name + File.separator + name s+ ".db"));
         } catch(IOException e) {
             return 1;
         }

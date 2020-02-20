@@ -51,13 +51,14 @@ public class InputOutput {
             String line;
             count = 0;
             fileReader = new BufferedReader(new InputStreamReader(
-            		new FileInputStream(file), "UTF-8"));
+                    new FileInputStream(file), "UTF-8"));
 
             /* Get rid of UTF-8 BOM issue for bug #2. -sdr */
             fileReader.mark(1);
-            if (fileReader.read() != 0xFEFF)
-              fileReader.reset();
-            
+            if (fileReader.read() != 0xFEFF) {
+                fileReader.reset();
+            }
+
             // Read First Row of CSV as Headers
             line = fileReader.readLine();
             headers = line.split(DELIMITER);
@@ -87,7 +88,8 @@ public class InputOutput {
             Record Min & Max for Each Column of Data
              */
             while ((line = fileReader.readLine()) != null) {
-                double[] columns = Arrays.stream(line.split(DELIMITER)).mapToDouble(Double::parseDouble).toArray();
+                double[] columns = Arrays.stream(line.split(DELIMITER))
+                        .mapToDouble(Double::parseDouble).toArray();
                 db.insertDatabase(columns);
                 this.getMinAndMax(columns);
             }
@@ -108,6 +110,9 @@ public class InputOutput {
         System.out.println("Max Values: " + Arrays.toString(maxValues));
         System.out.println(Arrays.toString(parseInfo));
         /* --------------- FOR TESTING --------------- */
+
+        // Save Summary Data to CSV File
+        this.saveColumnNames(dbName);
 
         return parseInfo;
     }
@@ -136,13 +141,23 @@ public class InputOutput {
     }
 
     /**
-     * Saves DBName to a Text File for Last State Load
+     * Creates New Directory for Each Loaded Database. Saves DBName to a Text 
+     * File within Directory for Last State Load 
      *
      * @param dbName Name of Database to be Stored
      */
     public void setCurrentDatabase(String dbName) {
-        try (PrintWriter pw = new PrintWriter("DBName.txt")) {
-            pw.println(dbName);
+        try {
+            File file = new File(dbName);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            try (PrintWriter pw = new PrintWriter(dbName + "\\DBName.txt")) {
+                pw.println(dbName);
+            }
+            try (PrintWriter pw = new PrintWriter("CurrentDB.txt")) {
+                pw.println(dbName);
+            }
         } catch (FileNotFoundException fnf) {
             System.out.println("ERROR: " + fnf);
         }
@@ -150,7 +165,7 @@ public class InputOutput {
 
     /**
      * Reads Stored DBName from Text File for Last State Load. Creates Empty
-     * DBName.txt if no Database has been Loaded.
+     * CurrentDB.txt if no Database has been Loaded.
      *
      * @return dbName If File Exists, null if File Does Not Exist
      */
@@ -158,11 +173,11 @@ public class InputOutput {
 
         // Pull Previous DB Name from Text File if Exists
         try {
-            fileReader = new BufferedReader(new FileReader("DBName.txt"));
-            String dbName = fileReader.readLine();
-            return dbName;
+            fileReader = new BufferedReader(new FileReader("CurrentDB.txt"));
+            String currentDB = fileReader.readLine();
+            return currentDB;
         } catch (FileNotFoundException fnf) {
-            System.out.println("ERROR: DBName.txt not found. Creating File...");
+            System.out.println("ERROR: No Current Database. Creating File...");
             this.setCurrentDatabase("");
             return null;
         } catch (IOException ioe) {
@@ -170,5 +185,70 @@ public class InputOutput {
         }
         // Return Null if File not Found
         return null;
+    }
+    
+    /**
+     * Saves Summary Information to CSV File in DB Folder
+     */
+    private void saveColumnNames(String dbName) {
+        // Create File at location DBName/DBNameSummary.csv
+        try (PrintWriter pw = new PrintWriter(dbName + "\\" + dbName
+                + "Summary.csv")) {
+            pw.println("Column,Min,Max");
+            for (int i = 0; i < headers.length; i++) {
+                pw.println(headers[i] + "," + minValues[i] + "," + maxValues[i]);
+            }
+        } catch (FileNotFoundException fnf) {
+            System.out.println("ERROR: " + fnf);
+        }
+    }
+
+    /**
+     * Loads any previously created CSV Summary file that contains column names
+     * with min and max values
+     *
+     * @param dbName String Database Summary to be Loaded
+     * @return String[] of "Column Min-Max" values
+     */
+    public String[] loadColumnNames(String dbName) {
+
+        // Using Arraylist because initial size is unknown
+        ArrayList<String> list = new ArrayList<>();
+
+        try {
+            String line;
+
+            File file = new File(dbName + "\\" + dbName + "Summary.csv");
+            fileReader = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(file), "UTF-8"));
+
+            /* Get rid of UTF-8 BOM issue for bug #2. -sdr */
+            fileReader.mark(1);
+            if (fileReader.read() != 0xFEFF) {
+                fileReader.reset();
+            }
+
+            // Skip first line of headers
+            fileReader.readLine();
+
+            // First item is current DBName
+            list.add(dbName);
+
+            // Parse CSV Summary File, assumes Column Name, Min, Max (3 vars)
+            while ((line = fileReader.readLine()) != null) {
+                String[] tempArray = line.split(DELIMITER);
+                String tempStr = tempArray[0] + " " + tempArray[1]
+                        + "-" + tempArray[2];
+                list.add(tempStr);
+            }
+
+        } catch (IOException ioe) {
+            System.out.println("ERROR: " + ioe);
+        }
+
+        // Convert ArrayList back to String Array
+        String[] dbSummary = new String[list.size()];
+        list.toArray(dbSummary);
+        return dbSummary;
     }
 }

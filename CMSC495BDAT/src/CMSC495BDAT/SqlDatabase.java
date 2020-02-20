@@ -473,27 +473,33 @@ public class SqlDatabase
         return values;
     }
 
-    /* listDatabase - returns a list of all databases.
+    /* listDatabase - returns a list of all databases found in subdirectories.
      * 
      * @return Array of database names
-     * 
-     * TODO: currently broken - need to search for databases in subdirectories.
      */
     String[] listDatabase()
     {
         String[] names;
+        ArrayList<String> namesList = new ArrayList<String>();
         File directory = new File(".");
-
-        FilenameFilter filter = new FilenameFilter(){
-             public boolean accept(File dir, String name) {
-                return (name.toLowerCase().endsWith(".db"));
-             }
-        };
-
-        names = directory.list(filter);
-
-        for (int i = 0; i < names.length; i++)
-            names[i] = names[i].substring(0, names[i].lastIndexOf('.'));
+        
+        try {
+			Files.walk(Paths.get("."))
+			.filter(Files::isRegularFile)
+			.forEach((f)->{
+			    String file = f.toString();
+			    if( file.endsWith(".db"))
+			        namesList.add(file);
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        names = new String[namesList.size()];
+        
+        for (int i = 0; i < namesList.size(); i++) {
+            names[i] = namesList.get(i).substring(2, namesList.get(i).lastIndexOf(File.separator));
+        }
 
         return names;
     }

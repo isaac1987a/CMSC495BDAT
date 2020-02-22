@@ -1,7 +1,9 @@
 package CMSC495BDAT;
+
+
 /*  File: InputOutput.java
     Author: Adam Rittermann
-    Date: 10 February 2020
+    Date: 19 February 2020
     Purpose:  CSV Parser. Passes values to SQL for storage. Returns
             Min/Max values for each column. Stores current DB Name
             for Last State Load */
@@ -12,7 +14,6 @@ package CMSC495BDAT;
     setCurrentDatabase(String dbName): void;
     loadColumnNames(String dbName): String[] dbSummary;
  */
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +28,7 @@ import java.util.Arrays;
 public class InputOutput {
 
     // parseFile Variables
-    private BufferedReader fileReader; 
+    private BufferedReader fileReader;
     private final String DELIMITER = ",";
     private String[] parseInfo;
     private String[] headers;
@@ -193,16 +194,23 @@ public class InputOutput {
      * Saves Summary Information to CSV File in DB Folder
      */
     private void saveColumnNames(String dbName) {
-        // Create File at location DBName/DBNameSummary.csv
-        try (PrintWriter pw = new PrintWriter(dbName + "\\" + dbName
-                + "Summary.csv")) {
-            pw.println("Column,Min,Max");
-            for (int i = 0; i < headers.length; i++) {
-                pw.println(headers[i] + "," + minValues[i] + "," + maxValues[i]);
-            }
-        } catch (FileNotFoundException fnf) {
-            System.out.println("ERROR: " + fnf);
+        ArrayList<String> contentsArray = new ArrayList<>();
+
+        String fileName = "Summary.csv";
+
+        // Headers for Summary Info
+        contentsArray.add("Column, Min, Max");
+
+        // Contents of Summary Info
+        for (int i = 0; i < headers.length; i++) {
+            contentsArray.add(headers[i] + "," + minValues[i] + ","
+                    + maxValues[i]);
         }
+
+        // Create CSV with Summary Info
+        String[] fileContents = new String[contentsArray.size()];
+        contentsArray.toArray(fileContents);
+        this.createFile(dbName, fileName, fileContents);
     }
 
     /**
@@ -243,7 +251,6 @@ public class InputOutput {
                         + "-" + tempArray[2];
                 list.add(tempStr);
             }
-
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
         }
@@ -262,14 +269,11 @@ public class InputOutput {
      * @param searchInfo String Information contained in Search
      */
     public void saveSearch(String dbName, String searchName, String searchInfo) {
-        try {
-            try (PrintWriter pw = new PrintWriter(dbName + "\\"
-                    + searchName + ".txt")) {
-                pw.println(searchInfo);
-            }
-        } catch (FileNotFoundException fnf) {
-            System.out.println("ERROR: " + fnf);
-        }
+        String fileType = searchName + ".txt";
+        // Create String[] for createFile param.
+        String[] search = new String[1];
+        search[0] = searchInfo;
+        this.createFile(dbName, fileType, search);
     }
 
     /**
@@ -286,7 +290,7 @@ public class InputOutput {
         // Pull Previous Search from Text File if Exists
         try {
             fileReader = new BufferedReader(new FileReader(dbName + "\\"
-                    + searchName + ".txt"));
+                    + dbName + searchName + ".txt"));
             String line;
             while ((line = fileReader.readLine()) != null) {
                 searchList.add(line);
@@ -304,4 +308,22 @@ public class InputOutput {
         return null;
     }
 
+    /**
+     * Support Method to Create Files in their Respective Directory
+     *
+     * @param dbName String Database Name
+     * @param fileType String File Name (e.g. "Summary.csv", ".txt", etc)
+     * @param fileContents String[] File Contents
+     */
+    private void createFile(String dbName, String fileType,
+            String[] fileContents) {
+        try (PrintWriter pw = new PrintWriter(dbName + "\\" + dbName
+                + fileType)) {
+            for (String fileContent : fileContents) {
+                pw.println(fileContent);
+            }
+        } catch (IOException ioe) {
+            System.out.println("ERROR: " + ioe);
+        }
+    }
 }

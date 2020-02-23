@@ -18,8 +18,8 @@ import java.util.Arrays;
  */
 public class StaticMath {
 
-    private double pValue;
-    private double bestFitCurve;
+    private static double pValue;
+    private static double bestFitCurve;
 
     /**
      * Calculate Mean of Target Column Values
@@ -27,7 +27,7 @@ public class StaticMath {
      * @param column double[] column data
      * @return double mean
      */
-    public double calculateMean(double[] column) {
+    public static double calculateMean(double[] column) {
         double sum = 0.0;
 
         for (int i = 0; i < column.length; i++) {
@@ -42,7 +42,7 @@ public class StaticMath {
      * @param column double[] column data
      * @return double median
      */
-    public double calculateMedian(double[] column) {
+    public static double calculateMedian(double[] column) {
         Arrays.sort(column);
 
         if (column.length % 2 != 0) {
@@ -58,7 +58,7 @@ public class StaticMath {
      * @param column double[] column data
      * @return double mode
      */
-    public double calculateMode(double[] column) {
+    public static double calculateMode(double[] column) {
         int maxCount = 0;
         double mode = 0.0;
 
@@ -83,9 +83,9 @@ public class StaticMath {
      * @param column double[] column data
      * @return double standard deviation
      */
-    public double calculateStdDeviation(double[] column) {
+    public static double calculateStdDeviation(double[] column) {
         double stdDevSum = 0.0;
-        double mean = this.calculateMean(column);
+        double mean = calculateMean(column);
 
         for (int i = 0; i < column.length; i++) {
             stdDevSum += Math.pow(column[i] - mean, 2.0);
@@ -101,7 +101,7 @@ public class StaticMath {
      * @return double pValue
      * -- NOT IMPLEMENTED
      */
-    public double calculatePValue(double[] column) {
+    public static double calculatePValue(double[] column) {
         return pValue;
     }
 
@@ -112,7 +112,7 @@ public class StaticMath {
      * @params columns double[][] column x and y
      * @return double[] m and c for linear function y=mx+b
      */
-    public double[] calculateBestFitLine(double[][] columns) {
+    public static double[] calculateBestFitLine(double[][] columns) {
         double m, b;
         double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
 
@@ -142,7 +142,7 @@ public class StaticMath {
      * @return double bestFitCurve
      * -- NOT IMPLEMENTED
      */
-    public double calculateBestFitCurve(double[][] columns) {
+    public static double calculateBestFitCurve(double[][] columns) {
         return bestFitCurve;
     }
 
@@ -152,9 +152,9 @@ public class StaticMath {
      * @param columns double[][] x and y values for calculation
      * @return double R-squared value
      */
-    public double calculateR2(double[][] columns) {
+    public static double calculateR2(double[][] columns) {
         double r2 = 0.0;
-        double[] vars = this.calculateBestFitLine(columns);
+        double[] vars = calculateBestFitLine(columns);
         double slope = vars[0];
         double intercept = vars[1];
         double sumY = 0;

@@ -7,6 +7,8 @@
 package CMSC495BDAT;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.*;
@@ -26,14 +28,19 @@ public class GUI extends JFrame implements ActionListener{
 	JMenu menu;
 	JMenuItem loadDB;
 	//Create GUI objects
+	private GridBagLayout gridLayout=new GridBagLayout();
+	private GridBagConstraints c = new GridBagConstraints();
 	private Vector <SearchType> searchTypes = new Vector<SearchType>();
-	private String[] types = {"Tabular"};  //Types of displays
+	private String[] types = {"Tabular", "Histogram", "Scatter Plot"};  //Types of displays
 	private JComboBox<String> searchSelectorBox=new JComboBox<String>(types);
 	private JPanel searchPanel=new JPanel();
 	private JButton searchButton= new JButton("Search");
+	
+	
 	private InputOutput io = new InputOutput();
 	private String[] columnNames= {""};
 	private SqlDatabase db = new SqlDatabase();
+	
 	public GUI() {
 		startup();
 		
@@ -60,6 +67,7 @@ public class GUI extends JFrame implements ActionListener{
 		
 		
 		//add Panels
+		searchPanel.setLayout(gridLayout);
 		add(searchPanel);
 		
 		//add MenuBar
@@ -72,23 +80,37 @@ public class GUI extends JFrame implements ActionListener{
 			}
 		});
 		
-		searchPanel.setLayout(new GridLayout(6, 1));
-		searchPanel.add(searchSelectorBox);
-		//test data
-		for (int i=0; i<1; i++) {
-			searchTypes.add(new SearchType(columnNames, 0, "Nowhere"));
-		}
-		for (int i=0; i<searchTypes.size(); i++) {
-			searchPanel.add(searchTypes.get(i));
-		}
+		//Create the Search Search Panel Layout
 		
-		searchPanel.add(searchButton);
+		c.anchor=GridBagConstraints.PAGE_START;
+		c.fill = GridBagConstraints.VERTICAL;
+		c.gridwidth=GridBagConstraints.REMAINDER;
+		c.weightx=1;
+		c.gridx=0;
+		c.gridy=0;
+		searchPanel.add(searchSelectorBox,c);
+		
+		//Add Search Grid
+		searchTypes.add(new SearchType(columnNames, 0, "nowhere", searchSelectorBox.getSelectedItem().toString()));
+		c.fill = GridBagConstraints.VERTICAL;
+		c.weightx=1;
+		c.gridx=0;
+		c.gridy=GridBagConstraints.RELATIVE;
+		searchPanel.add(searchTypes.get(0),c);
+		
+		c.fill = GridBagConstraints.VERTICAL;
+		c.weightx=1;
+		c.gridx=0;
+		c.ipady=20;
+		c.anchor=GridBagConstraints.PAGE_END;
+		c.gridy=GridBagConstraints.RELATIVE;
+		c.gridwidth=1;
+		searchPanel.add(searchButton,c);
 		//execute the Search
 		searchButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent arg0) {
 				executeSearch();
 			}
-
 			
 		});
 		setVisible(true);
@@ -116,13 +138,17 @@ public class GUI extends JFrame implements ActionListener{
 		
 
 		//Get current DB list and select current DB
-		JComboBox dbList=new JComboBox(db.listDatabase());
+		JComboBox<String> dbList=new JComboBox<String>(db.listDatabase());
 		JButton accept=new JButton("Select DB");
 		accept.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
 			db.selectDatabase(String.valueOf(dbList.getSelectedItem()));
 			io.setCurrentDatabase(String.valueOf(dbList.getSelectedItem()));
 			columnNames=db.getColumnDatabase();
 			createMainWindow();
+			
+			//Clean up this window
+			dbSelectFrame.setVisible(false);
+			dbSelectFrame.dispose();
 		}
 		});
 		
@@ -154,6 +180,10 @@ public class GUI extends JFrame implements ActionListener{
 			db.selectDatabase(io.getCurrentDatabase());
 			columnNames=db.getColumnDatabase();
 			createMainWindow();
+			
+			//Clean up this window
+			dbSelectFrame.setVisible(false);
+			dbSelectFrame.dispose();
 		}
 		});
 		
@@ -181,24 +211,27 @@ public class GUI extends JFrame implements ActionListener{
 		//Generate Data and Send to Tabular View
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Tabular")) {
 			searchTypes.get(0).prepare();
-			/*
-			//Convert Search arraylist to double array
-			ArrayList <ArrayList <Double>> tmpVector = db.exportDatabase();
-			double[][] dataList= new double[tmpVector.size()][tmpVector.get(0).size()];
-			for (int i=0; i<tmpVector.size(); i++) {
-				double[] tmp1DArray = new double[tmpVector.get(0).size()];
-				for (int j=0; j<tmpVector.get(0).size(); j++) {
-					tmp1DArray[j]=tmpVector.get(i).get(j).doubleValue();
-				}
-				dataList[i]= tmp1DArray;
-			}*/
+			
 			//execute the search
 			TabularView chart = new TabularView(displayFrame, db.getValuesDatabase(searchTypes.get(0).getSQLParameters()), db.getColumnDatabase());
+			return;
 		}
-		//Prep Search Discriminators
-		//Select Search Type
-		//Execute Search
-		//Send to Display Layer
+		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Histogram")) {
+			searchTypes.get(0).prepare();
+			double [] values = {1,2,3,4,5,6,7,8,9};
+			ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchTypes.get(0).getColumn(), searchTypes.get(0).getSQLParameters()), searchTypes.get(0).getColumn());
+		}
+		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Scatter Plot")) {
+
+		}
+		
+	
+		
+	}
+	public void addType() {
+		
+	}
+	public void remType() {
 		
 	}
 }

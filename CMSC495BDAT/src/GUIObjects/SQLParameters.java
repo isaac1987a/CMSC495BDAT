@@ -7,6 +7,8 @@
 package GUIObjects;
 
 import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -28,17 +30,49 @@ public class SQLParameters extends JPanel{
 	private String[] discriminatorString= {">", ">=", "=", "<=", "<"};
 	private JComboBox<String> discriminator = new JComboBox<String>(discriminatorString);
 	private JTextField entryField=new JTextField();
-	private JButton addButton;
-	private JButton delButton;
+	public int objectNumber;
 	
 
 	//Generate GUI
-	public SQLParameters(String[] columns) {
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+	public SQLParameters(String[] columns, int i) {
+		objectNumber = i;
+		setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		
 		columnSelection=new JComboBox<String>(columns);
-		add(columnSelection);
-		add(discriminator);
-		add(entryField);
+		
+		c.weightx=.5;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.gridy=0;
+		add(columnSelection,c);
+		
+		c.weightx=.5;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.gridy=0;
+		add(discriminator,c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx=2.0;
+		c.weighty=1.0;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.gridy=0;
+		entryField.setColumns(15);
+		add(entryField,c);
+		
+		
+		c.weightx=2.0;
+		c.weighty=1.0;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.gridy=0;
+		entryField.setColumns(10);
+		add(entryField,c);
+		
+		
+		/*c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx=.5;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.gridy=0;
 		addButton=new JButton("+");
 		addButton.setForeground(Color.GREEN);
 		delButton=new JButton("-");
@@ -47,7 +81,7 @@ public class SQLParameters extends JPanel{
 		addSubPanel.setLayout(new BoxLayout(addSubPanel, BoxLayout.Y_AXIS));
 		addSubPanel.add(addButton);
 		addSubPanel.add(delButton);
-		add(addSubPanel);
+		add(addSubPanel,c);*/
 	}
 	
 	public void prepare() {
@@ -57,23 +91,29 @@ public class SQLParameters extends JPanel{
 		columnName=String.valueOf(columnSelection.getSelectedItem());
 		operator=String.valueOf(discriminator.getSelectedItem());
 		String tmpStr=entryField.getText();
-		
 		//Check for edge case of "" in value field
 		if (entryField.getText().equals("")||entryField.getText()==null){
-			entryField.setBackground(Color.WHITE);
+			entryField.setBackground(Color.BLUE);
 			valid=false;
 			return;
 		}
 		
 		//Set value from user entry.  If invalid entry
 		//BG color goes red and Valid=false
-		try {
-			value=Double.parseDouble(tmpStr);
-			entryField.setBackground(Color.WHITE);
+		if ((entryField.getText().matches("[0-9]+")||entryField.getText().matches("[0-9]+[.][0-9]*"))) {
+			try {
+				value=Double.parseDouble(tmpStr);
+				entryField.setBackground(Color.WHITE);
+			}
+			catch (NumberFormatException e){
+				valid=false;
+				entryField.setBackground(Color.RED);
+			}
 		}
-		catch (NumberFormatException e){
+		else {
+			entryField.setBackground(Color.GREEN);
 			valid=false;
-			entryField.setBackground(Color.RED);
 		}
+
 	}
 }

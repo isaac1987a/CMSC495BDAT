@@ -540,7 +540,7 @@ public class SqlDatabase
     int deleteDatabase(String name)
     {
         try {
-            Files.deleteIfExists(Paths.get(name + File.separator + name s+ ".db"));
+            Files.deleteIfExists(Paths.get(name + File.separator + name + ".db"));
         } catch(IOException e) {
             return 1;
         }

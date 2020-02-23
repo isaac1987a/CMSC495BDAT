@@ -132,7 +132,7 @@ public class ScatterChartView extends AbstractChartView {
 
 
   /** Testing: show chart */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 
     JFrame testFrame = new JFrame();
     testFrame.setTitle("TEST launcher: ScatterChartView");
@@ -146,6 +146,6 @@ public class ScatterChartView extends AbstractChartView {
     TestCSV csv = new TestCSV();
     ScatterChartView test = new ScatterChartView(testFrame, csv.getColumn(0), csv.getColumnName(0));
     test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // kills app directly in this mode
-	}
+	}*/
 
 }

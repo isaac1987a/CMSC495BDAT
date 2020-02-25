@@ -13,14 +13,20 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.*;
 
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.IO;
 
-import GUIObjects.SearchType;
+import GUIObjects.SearchOption;
 import javafx.stage.FileChooser;
 
 public class GUI extends JFrame implements ActionListener{
@@ -30,18 +36,19 @@ public class GUI extends JFrame implements ActionListener{
 	//Create GUI objects
 	private GridBagLayout gridLayout=new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
-	private Vector <SearchType> searchTypes = new Vector<SearchType>();
+	private Vector <SearchOption> SearchOptions = new Vector<SearchOption>();
 	private String[] types = {"Tabular", "Histogram", "Scatter Plot"};  //Types of displays
 	private JComboBox<String> searchSelectorBox=new JComboBox<String>(types);
 	private JPanel searchPanel=new JPanel();
 	private JButton searchButton= new JButton("Search");
-	
+	private JComboBox<String> loadSearchBox = new JComboBox();
 	
 	private InputOutput io = new InputOutput();
 	private String[] columnNames= {""};
 	private SqlDatabase db = new SqlDatabase();
 	
 	public GUI() {
+		SearchOptions = new Vector<SearchOption>();
 		startup();
 		
 		//Create Window
@@ -50,11 +57,10 @@ public class GUI extends JFrame implements ActionListener{
 	}
 	//Create main window.  Separated into it's own class to 
 	private void createMainWindow() {
-		
+		setVisible(false);
 		//Reset Everything
 		searchPanel.removeAll();
 		searchPanel=new JPanel();
-		searchTypes = new Vector<SearchType>();
 		
 		//Set Window Size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -91,12 +97,12 @@ public class GUI extends JFrame implements ActionListener{
 		searchPanel.add(searchSelectorBox,c);
 		
 		//Add Search Grid
-		searchTypes.add(new SearchType(columnNames, 0, "nowhere", searchSelectorBox.getSelectedItem().toString()));
+		SearchOptions.add(new SearchOption(columnNames, 0, "nowhere", searchSelectorBox.getSelectedItem().toString()));
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weightx=1;
 		c.gridx=0;
 		c.gridy=GridBagConstraints.RELATIVE;
-		searchPanel.add(searchTypes.get(0),c);
+		searchPanel.add(SearchOptions.get(0),c);
 		
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weightx=1;
@@ -113,6 +119,35 @@ public class GUI extends JFrame implements ActionListener{
 			}
 			
 		});
+		//Save Search Test Button
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.weightx=1;
+		c.gridx=0;
+		c.ipady=20;
+		c.gridwidth=1;
+		searchPanel.add(loadSearchBox,c);
+		
+		
+		
+		//Load Search Test Button
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.weightx=1;
+		c.gridx=0;
+		c.ipady=20;
+		c.gridwidth=1;
+		JButton loadButton = new JButton("Load");
+		loadButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//if (arg0.getSource().equals(loadButton))
+					//loadSearch();		
+			}
+		});
+		searchPanel.add(loadButton,c);
+		
+		
+		
 		setVisible(true);
 
 	}
@@ -210,28 +245,38 @@ public class GUI extends JFrame implements ActionListener{
 		
 		//Generate Data and Send to Tabular View
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Tabular")) {
-			searchTypes.get(0).prepare();
+			SearchOptions.get(0).prepare();
 			
 			//execute the search
-			TabularView chart = new TabularView(displayFrame, db.getValuesDatabase(searchTypes.get(0).getSQLParameters()), db.getColumnDatabase());
+			TabularView chart = new TabularView(displayFrame, db.getValuesDatabase(SearchOptions.get(0).getSQLParameters()), db.getColumnDatabase());
+			//saveSearch();
 			return;
 		}
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Histogram")) {
-			searchTypes.get(0).prepare();
+			SearchOptions.get(0).prepare();
 			double [] values = {1,2,3,4,5,6,7,8,9};
-			ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchTypes.get(0).getColumn(), searchTypes.get(0).getSQLParameters()), searchTypes.get(0).getColumn());
+			ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(SearchOptions.get(0).getColumn(), SearchOptions.get(0).getSQLParameters()), SearchOptions.get(0).getColumn());
+			//saveSearch();
+			return;
 		}
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Scatter Plot")) {
-
+			
+			//saveSearch();
+			return;
 		}
 		
 	
 		
 	}
-	public void addType() {
-		
+	/*public void saveSearch() {
+		Random rand = new Random();
+		int id=rand.nextInt();
+		io.saveSearch(io.getCurrentDatabase(), SearchOptions.getSearchName()+","+id, SearchOptions,  id);
 	}
-	public void remType() {
-		
-	}
+	public void loadSearch(String searchName) {
+		String[] splitStr = searchName.split(",");
+		SearchOptions=io.loadSearch(Integer.parseInt(splitStr[splitStr.length-1]));
+		searchSelectorBox.setSelectedItem(SearchOptions.get(0).searchType);
+		buildGUI();
+	}*/
 }

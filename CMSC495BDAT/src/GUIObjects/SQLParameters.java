@@ -29,6 +29,7 @@ public class SQLParameters extends JPanel{
 	private JComboBox<String> columnSelection;
 	private String[] discriminatorString= {">", ">=", "=", "<=", "<"};
 	private JComboBox<String> discriminator = new JComboBox<String>(discriminatorString);
+	
 	private JTextField entryField=new JTextField();
 	public int objectNumber;
 	
@@ -93,7 +94,7 @@ public class SQLParameters extends JPanel{
 		String tmpStr=entryField.getText();
 		//Check for edge case of "" in value field
 		if (entryField.getText().equals("")||entryField.getText()==null){
-			entryField.setBackground(Color.BLUE);
+			entryField.setBackground(Color.WHITE);
 			valid=false;
 			return;
 		}
@@ -111,9 +112,12 @@ public class SQLParameters extends JPanel{
 			}
 		}
 		else {
-			entryField.setBackground(Color.GREEN);
+			entryField.setBackground(Color.RED);
 			valid=false;
 		}
+	}
 
+	public String createSearchString() {
+		return columnSelection.getSelectedItem().toString() + " "+ discriminator.getSelectedItem().toString()+ " "+ entryField.getText();
 	}
 }

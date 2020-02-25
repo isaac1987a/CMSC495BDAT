@@ -26,7 +26,7 @@ import javax.swing.JPanel;
 
 import CMSC495BDAT.GUI;
 
-public class SearchType extends JPanel implements ActionListener{
+public class SearchOption extends JPanel implements ActionListener{
 	private String[] columns;
 	GridBagLayout gridLayout = new GridBagLayout();
 	private JComboBox <String>columnsBox;
@@ -34,17 +34,18 @@ public class SearchType extends JPanel implements ActionListener{
 	private JButton colorChooser1;
 	private JCheckBox additionalOption;
 	private JButton colorChooser2;
-	private Vector <SQLParameters> discriminators;
+	private Vector <SQLParameters> parametersVector;
 	private Vector <JPanel> addSubPanelVector;
-	private GUI gui;
+	public String searchType;
+
 	protected static final Insets insets1 = new Insets(0,10,4,10);
-	public SearchType(String[] columns, int layerNumber , String option, String searchType) {
+	public SearchOption(String[] columns, int layerNumber , String option, String searchType) {
 		addSubPanelVector = new Vector<JPanel>();
 		columnsBox=new JComboBox<String>(columns);
 		columnsBox2=new JComboBox<String>(columns);
-
+		this.searchType=searchType;
 		this.columns=columns;
-		discriminators=new Vector<SQLParameters>();
+		parametersVector=new Vector<SQLParameters>();
 
 		setLayout(gridLayout);
 		
@@ -111,12 +112,12 @@ public class SearchType extends JPanel implements ActionListener{
 	
 	//Set Values for Search
 	public void prepare() {
-		for (int i=0; i<discriminators.size(); i++) {
-			discriminators.get(i).prepare();
+		for (int i=0; i<parametersVector.size(); i++) {
+			parametersVector.get(i).prepare();
 		}
 	}
 	public Vector <SQLParameters> getSQLParameters() {
-		return discriminators;
+		return parametersVector;
 	}
 	public String getColumn() {
 		return columnsBox.getSelectedItem().toString();
@@ -168,7 +169,7 @@ public class SearchType extends JPanel implements ActionListener{
 		return addSubPanel;
 	}
 	
-	//add a discriminators line and a set of add/delete buttons
+	//add a parametersVector line and a set of add/delete buttons
 	private void addDisc() {
 		//Create Random Key Value
 		Random rand = new Random();
@@ -180,26 +181,26 @@ public class SearchType extends JPanel implements ActionListener{
 		c.weightx=.9;
 		c.gridx=0;
 		c.gridy=GridBagConstraints.RELATIVE;		
-		discriminators.add(new SQLParameters(columns, i));
-		add(discriminators.get(discriminators.size()-1),c);
+		parametersVector.add(new SQLParameters(columns, i));
+		add(parametersVector.get(parametersVector.size()-1),c);
 		//add the addition/removal panel
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx=.1;
 		c.gridx=GridBagConstraints.RELATIVE;
-		c.gridy=discriminators.size();
+		c.gridy=parametersVector.size();
 		add(createAddSubPanel(i), c);
 	}
 	
 	//Action Performed for Delete Button
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (discriminators.size()>1) {
-			//iterate through the discriminators to find the correct one then remve and delete it and its associated object
-			for (int i=0; i<discriminators.size(); i++) {
-				if (Integer.parseInt(e.getActionCommand())==discriminators.get(i).objectNumber){
-					this.remove(discriminators.get(i));
+		if (parametersVector.size()>1) {
+			//iterate through the parametersVector to find the correct one then remve and delete it and its associated object
+			for (int i=0; i<parametersVector.size(); i++) {
+				if (Integer.parseInt(e.getActionCommand())==parametersVector.get(i).objectNumber){
+					this.remove(parametersVector.get(i));
 					this.remove(addSubPanelVector.get(i));
-					discriminators.remove(i);
+					parametersVector.remove(i);
 					addSubPanelVector.remove(i);
 				}
 			
@@ -207,5 +208,24 @@ public class SearchType extends JPanel implements ActionListener{
 			repaint();
 			}	
 		}
+	}
+	/*public String saveSearch() {
+		String str="";
+		str+=columnsBox.getSelectedItem().toString() + "," + columnsBox.getSelectedItem().toString()+ ","
+		return "";
+	}*/
+	public String createSearchString() {
+		String str=searchType+" ";
+		if (searchType.equals("Histogram")||searchType.equals("Scatter Plot")) {
+			str+=columnsBox.getSelectedItem().toString()+" ";
+		}
+		if (searchType.equals("Scatter Plot")) {
+			str+=columnsBox2.getSelectedItem().toString()+" ";
+		}
+		for (int i=0; i<parametersVector.size(); i++) {
+			str+=parametersVector.get(i).createSearchString() + " ";
+		}
+		
+		return str;
 	}
 }

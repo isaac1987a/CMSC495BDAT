@@ -1,4 +1,4 @@
-package CMSC495BDAT;
+// package CMSC495BDAT;
 /*  File: ScatterChartView.java
     Author: Justin Rhodes
     Date: 21 February 2020
@@ -51,16 +51,35 @@ public class ScatterChartView extends AbstractChartView {
 
   private double[] xData = null;
   private double[] yData = null;
-  private String colName = null;
+  private String xName = "";
+  private String yName = "";
+  private Boolean crossPlot = null;
   private double[] linearFitParams = null;
 
-  /** Constructor that includes column names */
-  public ScatterChartView(JFrame parentFrame, double[] yData, String colName) {
+  /** Constructor for single variable view */
+  public ScatterChartView(JFrame parentFrame, double[] yData, String yName) {
     super(parentFrame);
+    this.crossPlot = false; // mark this as a single variable plot
     this.yData = yData;
-    this.xData = getIndexVector(yData.length); // give it a 1:n index
-    this.colName = colName;
+    this.xData = getIndexVector(yData.length);
+    this.yName = yName;
+    this.xName = "Row Number";
+    constructChart();
+  }
 
+  /** Constructor for 2 variable view */
+  public ScatterChartView(JFrame parentFrame, double[] xData, String xName, 
+                                              double[] yData, String yName) {
+    super(parentFrame);
+    this.crossPlot = true; // mark this as a single variable plot
+    this.yData = yData;
+    this.xData = xData;
+    this.yName = yName;
+    this.xName = xName;
+    constructChart();
+  }
+
+  private void constructChart() {
     // calculate a linear fit from the input data
     linearFitParams = StaticMath.calculateBestFitLine(combineVectors(xData, yData));
 
@@ -75,7 +94,10 @@ public class ScatterChartView extends AbstractChartView {
   /** Draw a scatter plot chart with linear fit */
   protected void addChart() {
     // set up a basic XY/scatter chart
-    XYChart chart = new XYChartBuilder().xAxisTitle("Row Number").yAxisTitle("Value").build();
+    XYChart chart = new XYChartBuilder()
+        .xAxisTitle(xName)
+        .yAxisTitle(yName)
+        .build();
 
     // Customize chart properties
     chart.getStyler().setLegendPosition(LegendPosition.OutsideS);
@@ -84,7 +106,7 @@ public class ScatterChartView extends AbstractChartView {
     chart.getStyler().setToolTipsEnabled(true);
 
     // Add primary data series
-    XYSeries dataSeries = chart.addSeries(colName, xData, yData);
+    XYSeries dataSeries = chart.addSeries("Data values", xData, yData);
     dataSeries.setLineStyle(SeriesLines.NONE);
     dataSeries.setMarker(SeriesMarkers.CIRCLE);
     
@@ -104,13 +126,22 @@ public class ScatterChartView extends AbstractChartView {
   protected void setInfoText() {
     StringBuilder infoString = new StringBuilder();
 
-    infoString.append("<h2>Data Statistics: " + colName + "</h2>");
+    // show first data set info if we have a 2-var view
+    if (crossPlot == true) {
+      infoString.append("<h2>Variable: " + xName + "</h2>");
+      infoString.append(String.format("Mean: %.4f<br>", StaticMath.calculateMean(xData)));
+      infoString.append(String.format("Median: %.4f<br>", StaticMath.calculateMedian(xData.clone())));
+      infoString.append(String.format("Mode: %.4f<br>", StaticMath.calculateMode(xData)));
+      infoString.append(String.format("Std dev: %.4f<br>", StaticMath.calculateStdDeviation(xData)));
+    }
+
+    infoString.append("<h2>Variable: " + yName + "</h2>");
     infoString.append(String.format("Mean: %.4f<br>", StaticMath.calculateMean(yData)));
     infoString.append(String.format("Median: %.4f<br>", StaticMath.calculateMedian(yData.clone())));
     infoString.append(String.format("Mode: %.4f<br>", StaticMath.calculateMode(yData)));
     infoString.append(String.format("Std dev: %.4f<br>", StaticMath.calculateStdDeviation(yData)));
     
-    infoString.append("<h3>Linear Fit: y=mx+b</h3>");
+    infoString.append("<h2>Linear Fit: y=mx+b</h2>");
     infoString.append(String.format(" m: %.4f<br>", linearFitParams[0]));
     infoString.append(String.format(" b: %.4f<br>", linearFitParams[1]));
     infoString.append(String.format(" R<sup>2</sup>: %.4f<br>", 
@@ -132,7 +163,7 @@ public class ScatterChartView extends AbstractChartView {
 
 
   /** Testing: show chart */
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 
     JFrame testFrame = new JFrame();
     testFrame.setTitle("TEST launcher: ScatterChartView");
@@ -146,6 +177,10 @@ public class ScatterChartView extends AbstractChartView {
     TestCSV csv = new TestCSV();
     ScatterChartView test = new ScatterChartView(testFrame, csv.getColumn(0), csv.getColumnName(0));
     test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // kills app directly in this mode
-	}*/
+
+    ScatterChartView test2 = new ScatterChartView(testFrame, csv.getColumn(0), csv.getColumnName(0),
+                                                             csv.getColumn(4), csv.getColumnName(4));
+    test2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // kills app directly in this mode
+	}
 
 }

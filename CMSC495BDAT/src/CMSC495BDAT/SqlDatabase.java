@@ -162,12 +162,18 @@ public class SqlDatabase
         		currentDatabaseName + ".db";
         ArrayList<ArrayList<Double>> retValues = new ArrayList<>();
         String[] columns = getColumnDatabase();
-        String sql = "SELECT * FROM dataset WHERE ";
+        String sql = "SELECT * FROM dataset";
+        Boolean validFlag = false;
         
         for (int i = 0; i < params.size(); i++) {
         	SQLParameters param = params.get(i);
 
         	if (param.valid) {
+        		if (!validFlag) {
+        			sql += " WHERE ";
+        			validFlag = true;
+        		}
+        		
         		sql += param.columnName + " ";
         		
         		switch (param.operator) {
@@ -247,11 +253,17 @@ public class SqlDatabase
         String url = "jdbc:sqlite:" + currentDatabaseName + File.separator +
         		currentDatabaseName + ".db";
         ArrayList<Double> retValues = new ArrayList<Double>();
-        String sql = "SELECT " + column + " FROM dataset WHERE ";
+        String sql = "SELECT " + column + " FROM dataset";
+        Boolean validFlag = false;
         
         for (int i = 0; i < params.size(); i++) {
         	SQLParameters param = params.get(i);
         	if (param.valid) {
+        		if (!validFlag) {
+        			sql += " WHERE ";
+        			validFlag = true;
+        		}
+
         		sql += param.columnName + " ";
         		
         		switch (param.operator) {

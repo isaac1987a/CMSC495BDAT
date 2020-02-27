@@ -138,7 +138,7 @@ public class StaticMath {
      * Formula: y = ar^x
      *
      * @params columns double[][] columns x and y
-     * @return double expCurve a and r
+     * @return double expCurve a, r
      */
     public static double[] calculateExponentialCurve(double[][] columns) {
         double m, b, a, r;
@@ -170,10 +170,10 @@ public class StaticMath {
      * Formula: y = ax^r
      *
      * @params columns double[][] columns x and y
-     * @return double powCurve
+     * @return double powCurve a, r
      */
     public static double[] calculatePowerCurve(double[][] columns) {
-        double m, b, a;
+        double r, b, a;
         double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
 
         for (double[] row : columns) {
@@ -183,27 +183,27 @@ public class StaticMath {
             sumX2 += Math.pow(Math.log(row[0]), 2);
         }
 
-        m = ((columns.length * sumXY) - (sumX * sumY))
+        r = ((columns.length * sumXY) - (sumX * sumY))
                 / ((columns.length * sumX2) - (Math.pow(sumX, 2)));
-        b = (sumY - m * sumX) / columns.length;
+        b = (sumY - r * sumX) / columns.length;
         
         a = Math.pow(Math.E, b);
 
         double[] powCurve = new double[2];
         powCurve[0] = a;
-        powCurve[1] = m;
+        powCurve[1] = r;
         return powCurve;
     }
 
     /**
      * Calculate Logarithmic Curve of Target 2 Columns 
-     * Formula: y = a*ln(x) + b
+     * Formula: y = a*ln(x) + r
      *
      * @params columns double[][] columns x and y
-     * @return double logCurve a, b
+     * @return double logCurve a, r
      */
     public static double[] calculateLogCurve(double[][] columns) {
-        double b, a;
+        double r, a;
         double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
 
         for (double[] row : columns) {
@@ -215,15 +215,15 @@ public class StaticMath {
 
         a = ((columns.length * sumXY) - (sumX * sumY))
                 / ((columns.length * sumX2) - (Math.pow(sumX, 2)));
-        b = (sumY - a * sumX) / columns.length;
+        r = (sumY - a * sumX) / columns.length;
 
         double[] logCurve = new double[2];
-        logCurve[0] = b;
+        logCurve[0] = r;
         logCurve[1] = a;
 
         return logCurve;
     }
-
+    
     /**
      * Calculate R-Squared Value for Linear Regression
      *

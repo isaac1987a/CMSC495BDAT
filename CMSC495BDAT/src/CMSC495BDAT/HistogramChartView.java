@@ -1,4 +1,4 @@
-// package CMSC495BDAT;
+ package CMSC495BDAT;
 /*  File: HistogramChartView.java
     Author: Justin Rhodes
     Date: 23 February 2020
@@ -45,6 +45,9 @@ import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.markers.SeriesMarkers;
+
+import GUIObjects.SearchOption;
+
 import org.knowm.xchart.style.colors.XChartSeriesColors;
 import org.knowm.xchart.style.lines.SeriesLines;
 import org.knowm.xchart.style.Styler;
@@ -64,11 +67,11 @@ public class HistogramChartView extends AbstractChartView {
   private double[] histogram;
 
   /** Constructor that includes column names */
-  public HistogramChartView(JFrame parentFrame, double[] yData, String colName) {
+  public HistogramChartView(JFrame parentFrame, double[] yData, SearchOption searchOption) {
     super(parentFrame);
     this.yData = yData;
     this.xData = getIndexVector(yData.length); // give it a 1:n index
-    this.colName = colName;
+    this.colName = searchOption.getColumn();
     
     calculateHistogram();
     
@@ -173,7 +176,7 @@ public class HistogramChartView extends AbstractChartView {
 
 
   /** Testing: show chart */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 
     JFrame testFrame = new JFrame();
     testFrame.setTitle("TEST launcher: HistogramChartView");
@@ -187,6 +190,6 @@ public class HistogramChartView extends AbstractChartView {
     TestCSV csv = new TestCSV();
     HistogramChartView test = new HistogramChartView(testFrame, csv.getColumn(2), csv.getColumnName(0));
     test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // kills app directly in this mode
-	}
+	}*/
 
 }

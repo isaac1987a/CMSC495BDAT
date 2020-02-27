@@ -1,4 +1,4 @@
-// package CMSC495BDAT;
+ package CMSC495BDAT;
 /*  File: ScatterChartView.java
     Author: Justin Rhodes
     Date: 21 February 2020

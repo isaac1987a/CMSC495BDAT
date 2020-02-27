@@ -26,7 +26,7 @@ public class SQLParameters extends JPanel{
 	public boolean valid = true;
 	
 	//Create GUI Elements
-	private JComboBox<String> columnSelection;
+	private JComboBox<ComboItemDualString> columnSelection;
 	private String[] discriminatorString= {">", ">=", "=", "<=", "<"};
 	private JComboBox<String> discriminator = new JComboBox<String>(discriminatorString);
 	
@@ -35,13 +35,13 @@ public class SQLParameters extends JPanel{
 	
 
 	//Generate GUI
-	public SQLParameters(String[] columns, int i) {
+	public SQLParameters(ComboItemDualString[] columns, int i) {
 		objectNumber = i;
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
 		
-		columnSelection=new JComboBox<String>(columns);
+		columnSelection=new JComboBox<ComboItemDualString>(columns);
 		
 		c.weightx=.5;
 		c.gridx=GridBagConstraints.RELATIVE;
@@ -89,7 +89,8 @@ public class SQLParameters extends JPanel{
 		
 		//Set values from data selection
 		valid=true;
-		columnName=String.valueOf(columnSelection.getSelectedItem());
+		ComboItemDualString selectedItem = (ComboItemDualString)columnSelection.getSelectedItem();
+		columnName=selectedItem.getColumnName();
 		operator=String.valueOf(discriminator.getSelectedItem());
 		String tmpStr=entryField.getText();
 		//Check for edge case of "" in value field
@@ -118,6 +119,8 @@ public class SQLParameters extends JPanel{
 	}
 
 	public String createSearchString() {
-		return columnSelection.getSelectedItem().toString() + " "+ discriminator.getSelectedItem().toString()+ " "+ entryField.getText();
+		if (valid)
+			return columnSelection.getSelectedItem().toString() + " "+ discriminator.getSelectedItem().toString()+ " "+ entryField.getText();
+		return "";
 	}
 }

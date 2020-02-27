@@ -24,6 +24,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Vector;
+
+import GUIObjects.ComboItem;
+import GUIObjects.SearchOption;
 
 public class InputOutput {
 
@@ -199,7 +203,7 @@ public class InputOutput {
         String fileName = "Summary.csv";
 
         // Headers for Summary Info
-        contentsArray.add("Column, Min, Max");
+        //contentsArray.add("Column, Min, Max");
 
         // Contents of Summary Info
         for (int i = 0; i < headers.length; i++) {
@@ -268,6 +272,7 @@ public class InputOutput {
      * @param searchName String Name of Search
      * @param searchInfo String Information contained in Search
      */
+    
     public void saveSearch(String dbName, String searchName, String searchInfo) {
         String fileType = searchName + ".txt";
         // Create String[] for createFile param.
@@ -283,6 +288,7 @@ public class InputOutput {
      * @param searchName String Name of Search
      * @return String thisSearch search to be loaded
      */
+
     public String[] loadSearch(String dbName, String searchName) {
 
         ArrayList<String> searchList = new ArrayList<>();
@@ -326,4 +332,38 @@ public class InputOutput {
             System.out.println("ERROR: " + ioe);
         }
     }
+  
+	//Export DB Feature.  Save the DB to a new file or overwrite a file with the selected file
+	public void exportDB(double[][] valuesDatabase, File selectedFile) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	//Have a persistant file that gets overwritten each time this is called.  This will be a vector with the names and keys
+	//Associate with current DB
+	public void updateSearchHistory(Vector<ComboItem> searchHistoryVector) {
+		// TODO Auto-generated method stub
+		
+	}
+	//Load the persistant search history file for the currently selected DB
+	public Vector<ComboItem> getSearchHistory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	//Save this data to a file associated with the current DB and key id.
+	//The key will be sent to find the file at a later time
+	public void saveSearch(Vector<SearchOption> searchOptions, int id) {
+		// TODO Auto-generated method stub
+		
+	}
+	//Load the file associated with the current DB and id Key
+	public Vector<SearchOption> loadSearch(String currentDatabase, int key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	//Delte the search history file associated with the key on the current DB
+		public void removeSearch(int key) {
+			// TODO Auto-generated method stub
+	}
+
 }

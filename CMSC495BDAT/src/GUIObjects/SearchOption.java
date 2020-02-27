@@ -15,41 +15,44 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import CMSC495BDAT.GUI;
 
 public class SearchOption extends JPanel implements ActionListener{
-	private String[] columns;
+	private ComboItemDualString[] columns;
 	GridBagLayout gridLayout = new GridBagLayout();
-	private JComboBox <String>columnsBox;
-	private JComboBox <String>columnsBox2;
+	private JComboBox <ComboItemDualString>columnsBox;
+	private JComboBox <ComboItemDualString>columnsBox2;
 	private JButton colorChooser1;
 	private JCheckBox additionalOption;
 	private JButton colorChooser2;
 	private Vector <SQLParameters> parametersVector;
 	private Vector <JPanel> addSubPanelVector;
-	public String searchType;
+	public ComboItem searchType;
 
-	protected static final Insets insets1 = new Insets(0,10,4,10);
-	public SearchOption(String[] columns, int layerNumber , String option, String searchType) {
+
+	public SearchOption(ComboItemDualString[] columns, int layerNumber , String option, ComboItem searchType) {
 		addSubPanelVector = new Vector<JPanel>();
-		columnsBox=new JComboBox<String>(columns);
-		columnsBox2=new JComboBox<String>(columns);
+		columnsBox=new JComboBox<ComboItemDualString>(columns);
+		columnsBox2=new JComboBox<ComboItemDualString>(columns);
 		this.searchType=searchType;
 		this.columns=columns;
 		parametersVector=new Vector<SQLParameters>();
 
 		setLayout(gridLayout);
 		
-		createSearchBar(0 , option, searchType);
+		createSearchBar(0 , option);
 		
 		
 		
@@ -57,7 +60,7 @@ public class SearchOption extends JPanel implements ActionListener{
 	//CheckBox
 	//+- vertical Split
 	}
-	private void createSearchBar(int layerNumber , String option, String searchType) {
+	private void createSearchBar(int layerNumber , String option) {
 		//JPanel searchTypePanel=new JPanel();
 		
 		GridBagConstraints c = new GridBagConstraints();
@@ -66,18 +69,18 @@ public class SearchOption extends JPanel implements ActionListener{
 		
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx=.9;
+		c.weightx=.7;
 		c.gridx=0;
 		c.gridy=0;
 		add(columnsBox,c);
 		//add the second option for 
-		//if (searchType.equals("Scatter Plot")){
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.weightx=1;
-			c.gridx=GridBagConstraints.RELATIVE;
-			c.gridy=0;
-			add(columnsBox2,c);
-		//}
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx=.7;
+		c.gridx=GridBagConstraints.RELATIVE;
+		c.gridy=0;
+		add(columnsBox2,c);
+		
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx=0.3;
@@ -87,6 +90,13 @@ public class SearchOption extends JPanel implements ActionListener{
 		colorChooser1 = new JButton(" ");
 		colorChooser1.setBackground(Color.RED);
 		add(colorChooser1,c );
+		colorChooser1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				colorChooser1.setBackground(JColorChooser.showDialog(SearchOption.this, "Choose Background Color",colorChooser1.getBackground()));
+				
+			}
+			
+		});
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx=0.4;
@@ -104,6 +114,13 @@ public class SearchOption extends JPanel implements ActionListener{
 		colorChooser2 = new JButton(" ");
 		colorChooser2.setBackground(Color.BLUE);
 		add (colorChooser2,c);
+		colorChooser1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				colorChooser2.setBackground(JColorChooser.showDialog(SearchOption.this, "Choose Background Color",colorChooser2.getBackground()));
+				
+			}
+			
+		});
 		
 		addDisc();
 	
@@ -119,11 +136,15 @@ public class SearchOption extends JPanel implements ActionListener{
 	public Vector <SQLParameters> getSQLParameters() {
 		return parametersVector;
 	}
+	//return column1
 	public String getColumn() {
-		return columnsBox.getSelectedItem().toString();
+		ComboItemDualString tmpItem = (ComboItemDualString)columnsBox.getSelectedItem();
+		return tmpItem.getColumnName();
 	}
+	//return column 2
 	public String getColumn2() {
-		return columnsBox2.getSelectedItem().toString();
+		ComboItemDualString tmpItem = (ComboItemDualString)columnsBox2.getSelectedItem();
+		return tmpItem.getColumnName();
 	}
 	
 	//Create a panel for the add and delete buttons
@@ -195,7 +216,7 @@ public class SearchOption extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (parametersVector.size()>1) {
-			//iterate through the parametersVector to find the correct one then remve and delete it and its associated object
+			//iterate through the parametersVector to find the correct one then remove and delete it and its associated object
 			for (int i=0; i<parametersVector.size(); i++) {
 				if (Integer.parseInt(e.getActionCommand())==parametersVector.get(i).objectNumber){
 					this.remove(parametersVector.get(i));
@@ -209,17 +230,15 @@ public class SearchOption extends JPanel implements ActionListener{
 			}	
 		}
 	}
-	/*public String saveSearch() {
-		String str="";
-		str+=columnsBox.getSelectedItem().toString() + "," + columnsBox.getSelectedItem().toString()+ ","
-		return "";
-	}*/
+	
+	
+	//String for displaying in the search history
 	public String createSearchString() {
 		String str=searchType+" ";
-		if (searchType.equals("Histogram")||searchType.equals("Scatter Plot")) {
+		if (searchType.getValue().equals("Histogram")||searchType.getValue().equals("Scatter Plot")) {
 			str+=columnsBox.getSelectedItem().toString()+" ";
 		}
-		if (searchType.equals("Scatter Plot")) {
+		if (searchType.getValue().equals("Scatter Plot")) {
 			str+=columnsBox2.getSelectedItem().toString()+" ";
 		}
 		for (int i=0; i<parametersVector.size(); i++) {
@@ -227,5 +246,46 @@ public class SearchOption extends JPanel implements ActionListener{
 		}
 		
 		return str;
+	}
+	//set search type for archiving and set the visible buttons for each search type
+	public void setSearchType(ComboItem item) {
+		searchType=item;
+		//Tabular View
+		if (searchType.getKey()==0) {
+			additionalOption.setVisible(false);
+			colorChooser1.setVisible(false);
+			colorChooser2.setVisible(false);
+			columnsBox.setVisible(false);
+			columnsBox2.setVisible(false);
+			revalidate();
+			repaint();
+		}
+			//Single Variable Charts
+		if (searchType.getKey()==1) {
+			colorChooser1.setVisible(true);
+			columnsBox.setVisible(true);
+			
+			additionalOption.setVisible(false);
+			colorChooser2.setVisible(false);
+			columnsBox2.setVisible(false);
+			revalidate();
+			repaint();
+		}
+		//dual variable charts
+		if (searchType.getKey()==2) {
+			additionalOption.setVisible(false);
+			colorChooser1.setVisible(true);
+			colorChooser2.setVisible(true);
+			columnsBox.setVisible(true);
+			columnsBox2.setVisible(true);
+			revalidate();
+			repaint();
+		}
+	}
+	public Color getColor1() {
+		return colorChooser1.getBackground();
+	}
+	public Color getColor2() {
+		return colorChooser2.getBackground();
 	}
 }

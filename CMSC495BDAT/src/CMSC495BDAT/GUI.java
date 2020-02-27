@@ -9,58 +9,67 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.IO;
-
+import GUIObjects.ComboItem;
+import GUIObjects.ComboItemDualString;
 import GUIObjects.SearchOption;
-import javafx.stage.FileChooser;
 
-public class GUI extends JFrame implements ActionListener{
+public class GUI extends JFrame{
 	JMenuBar menuBar;
 	JMenu menu;
 	JMenuItem loadDB;
 	//Create GUI objects
-	private GridBagLayout gridLayout=new GridBagLayout();
 	private GridBagConstraints c = new GridBagConstraints();
-	private Vector <SearchOption> SearchOptions = new Vector<SearchOption>();
-	private String[] types = {"Tabular", "Histogram", "Scatter Plot"};  //Types of displays
-	private JComboBox<String> searchSelectorBox=new JComboBox<String>(types);
+	private Vector <SearchOption> searchOptions = new Vector<SearchOption>();
+	//Combo Item Types Key
+	//0 = 0 column or all column displays
+	//1 = Single axis displays (eg histograms)
+	//2 = Dual axis displays (eg Scatterplots)
+	//3 = Triple axis displays
+	private ComboItem[] types = {new ComboItem("Tabular", 0), new ComboItem("Histogram", 1), new ComboItem("Scatter Plot", 2)}; 
+	private JComboBox<ComboItem> searchSelectorBox=new JComboBox<ComboItem>(types);
 	private JPanel searchPanel=new JPanel();
 	private JButton searchButton= new JButton("Search");
-	private JComboBox<String> loadSearchBox = new JComboBox();
+	private JComboBox<ComboItem> loadSearchBox = new JComboBox<ComboItem>();
 	
 	private InputOutput io = new InputOutput();
+	//private ComboItemDualString[] columnNames;
 	private String[] columnNames= {""};
 	private SqlDatabase db = new SqlDatabase();
+	private Vector<ComboItem> searchHistoryVector= new Vector<ComboItem>();
 	
 	public GUI() {
-		SearchOptions = new Vector<SearchOption>();
+		searchOptions = new Vector<SearchOption>();
 		startup();
 		
-		//Create Window
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
 	//Create main window.  Separated into it's own class to 
 	private void createMainWindow() {
 		setVisible(false);
+		remove(searchPanel);
 		//Reset Everything
-		searchPanel.removeAll();
 		searchPanel=new JPanel();
+		//Get current search history
+		searchHistoryVector=(io.getSearchHistory()!=null) ? io.getSearchHistory() : new Vector<ComboItem>();
 		
 		//Set Window Size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -73,7 +82,7 @@ public class GUI extends JFrame implements ActionListener{
 		
 		
 		//add Panels
-		searchPanel.setLayout(gridLayout);
+		searchPanel.setLayout(new GridBagLayout());
 		add(searchPanel);
 		
 		//add MenuBar
@@ -85,6 +94,21 @@ public class GUI extends JFrame implements ActionListener{
 				dbSelectionMenu();
 			}
 		});
+		JMenuItem exportSearch = new JMenuItem("Export Data");
+		exportSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fc = new JFileChooser();
+				int returnVal = fc.showSaveDialog(searchPanel);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					io.exportDB(db.getValuesDatabase(searchOptions.get(0).getSQLParameters()), fc.getSelectedFile());
+				}
+				else {
+					return;
+				}
+				
+			}
+		});
+		menu.add(exportSearch);
 		
 		//Create the Search Search Panel Layout
 		
@@ -95,14 +119,26 @@ public class GUI extends JFrame implements ActionListener{
 		c.gridx=0;
 		c.gridy=0;
 		searchPanel.add(searchSelectorBox,c);
+		searchSelectorBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				for (int i=0; i<searchOptions.size(); i++)
+					searchOptions.get(i).setSearchType((ComboItem) searchSelectorBox.getSelectedItem());
+			}
+		});
+		
+		
 		
 		//Add Search Grid
-		SearchOptions.add(new SearchOption(columnNames, 0, "nowhere", searchSelectorBox.getSelectedItem().toString()));
+		ComboItemDualString[] colNamesTemp = new ComboItemDualString[columnNames.length];
+		for (int i=0; i<columnNames.length; i++)
+			colNamesTemp[i]=new ComboItemDualString(columnNames[i], Integer.toString(i));
+		searchOptions.add(new SearchOption(colNamesTemp, 0, "nowhere", (ComboItem)searchSelectorBox.getSelectedItem()));
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weightx=1;
 		c.gridx=0;
 		c.gridy=GridBagConstraints.RELATIVE;
-		searchPanel.add(SearchOptions.get(0),c);
+		searchPanel.add(searchOptions.get(0),c);
 		
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weightx=1;
@@ -119,7 +155,7 @@ public class GUI extends JFrame implements ActionListener{
 			}
 			
 		});
-		//Save Search Test Button
+		//Search History Box
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx=GridBagConstraints.RELATIVE;
 		c.weightx=1;
@@ -140,14 +176,12 @@ public class GUI extends JFrame implements ActionListener{
 		JButton loadButton = new JButton("Load");
 		loadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//if (arg0.getSource().equals(loadButton))
-					//loadSearch();		
+				loadSearch((ComboItem)loadSearchBox.getSelectedItem());		
 			}
 		});
 		searchPanel.add(loadButton,c);
-		
-		
-		
+		revalidate();
+		repaint();
 		setVisible(true);
 
 	}
@@ -162,6 +196,7 @@ public class GUI extends JFrame implements ActionListener{
 		else {
 			dbSelectionMenu();
 		}
+		columnNames=io.loadColumnNames(io.getCurrentDatabase());
 	}
 	//create menu to select or create DB
 	private void dbSelectionMenu() {
@@ -229,12 +264,7 @@ public class GUI extends JFrame implements ActionListener{
 		dbSelectionPanel.add(nameBox);
 		dbSelectFrame.setVisible(true);
 	}
-	
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	
 	//Execute Search
 	private void executeSearch() {
@@ -242,41 +272,49 @@ public class GUI extends JFrame implements ActionListener{
 		JFrame displayFrame = new JFrame();
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		displayFrame.setSize(screenSize.height/2,screenSize.width/2);
-		
+		//Save the search String
+		searchOptions.get(0).prepare();
+		saveSearch();
 		//Generate Data and Send to Tabular View
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Tabular")) {
-			SearchOptions.get(0).prepare();
-			
-			//execute the search
-			TabularView chart = new TabularView(displayFrame, db.getValuesDatabase(SearchOptions.get(0).getSQLParameters()), db.getColumnDatabase());
-			//saveSearch();
+			TabularView chart = new TabularView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getSQLParameters()), db.getColumnDatabase());
 			return;
 		}
+		//
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Histogram")) {
-			SearchOptions.get(0).prepare();
-			double [] values = {1,2,3,4,5,6,7,8,9};
-			ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(SearchOptions.get(0).getColumn(), SearchOptions.get(0).getSQLParameters()), SearchOptions.get(0).getColumn());
-			//saveSearch();
+			HistogramChartView chart = new HistogramChartView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getColumn(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0));
 			return;
 		}
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Scatter Plot")) {
-			
-			//saveSearch();
+			ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getColumn(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0).getColumn(), db.getValuesDatabase(searchOptions.get(0).getColumn2(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0).getColumn2());
+			//ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getColumn(), searchOptions.get(0).getSQLParameters()), db.getValuesDatabase(searchOptions.get(0).getColumn2(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0));
 			return;
 		}
 		
 	
 		
 	}
-	/*public void saveSearch() {
+	//Save Search 
+	private void saveSearch() {
+		//Generate search ID
 		Random rand = new Random();
 		int id=rand.nextInt();
-		io.saveSearch(io.getCurrentDatabase(), SearchOptions.getSearchName()+","+id, SearchOptions,  id);
+		//Control the size of the search
+		if (searchHistoryVector.size()>9){
+			io.removeSearch(searchHistoryVector.get(0).getKey());
+			loadSearchBox.remove(0);
+			searchHistoryVector.remove(0);
+		}
+		searchHistoryVector.add(new ComboItem(searchOptions.get(0).createSearchString(), id));
+		loadSearchBox.addItem(searchHistoryVector.get(searchHistoryVector.size()-1));
+		io.saveSearch(searchOptions, id);
+		io.updateSearchHistory(searchHistoryVector);
+		
 	}
-	public void loadSearch(String searchName) {
-		String[] splitStr = searchName.split(",");
-		SearchOptions=io.loadSearch(Integer.parseInt(splitStr[splitStr.length-1]));
-		searchSelectorBox.setSelectedItem(SearchOptions.get(0).searchType);
-		buildGUI();
-	}*/
+	private void loadSearch(ComboItem searchItem) {
+		searchOptions=io.loadSearch(io.getCurrentDatabase(), searchItem.getKey());
+		searchSelectorBox.setSelectedItem(searchOptions.get(0).searchType);
+	}
+	//Set the Search Type
+	
 }

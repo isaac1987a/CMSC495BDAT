@@ -1,4 +1,4 @@
-// package CMSC495BDAT;
+package CMSC495BDAT;
 /*  File: AbstractChartView.java
     Author: Justin Rhodes
     Date: 20 February 2020

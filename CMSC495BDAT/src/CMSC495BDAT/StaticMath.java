@@ -105,11 +105,11 @@ public class StaticMath {
     }
 
     /**
-     * Calculate Best Fit Line of Target Columns
-     * Maximum 2 columns for X & Y
-     * 
+     * Calculate Best Fit Line of Target 2 Columns 
+     * Formula: y = mx + b
+     *
      * @params columns double[][] column x and y
-     * @return double[] m and c for linear function y=mx+b
+     * @return double[] m and b
      */
     public static double[] calculateBestFitLine(double[][] columns) {
         double m, b;
@@ -134,48 +134,76 @@ public class StaticMath {
     }
 
     /**
-     * Calculate Exponential Curve of Target 2 Columns
-     * Formula: y = ab^x
-     * 
+     * Calculate Exponential Curve of Target 2 Columns 
+     * Formula: y = ar^x
+     *
      * @params columns double[][] columns x and y
-     * @return double expCurve
+     * @return double expCurve a and r
      */
     public static double[] calculateExponentialCurve(double[][] columns) {
-        double[] mb = calculateBestFitLine(columns);
-        double a = Math.pow(10, mb[0]);
-        double b = Math.pow(10, mb[1]);
+        double m, b, a, r;
+        double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+        for (double[] row : columns) {
+            sumX += row[0];
+            sumY += Math.log10(row[1]);
+            sumXY += row[0] * Math.log10(row[1]);
+            sumX2 += Math.pow(row[0], 2);
+        }
+
+        m = ((columns.length * sumXY) - (sumX * sumY))
+                / ((columns.length * sumX2) - (Math.pow(sumX, 2)));
+        b = (sumY - m * sumX) / columns.length;
+
+        r = Math.pow(10, m);
+        a = Math.pow(10, b);
+
         double[] expCurve = new double[2];
         expCurve[0] = a;
-        expCurve[1] = b;
+        expCurve[1] = r;
+
         return expCurve;
     }
 
     /**
-     * Calculate Power Curve of Target 2 Columns
-     * Formula: y = ax^b
-     * 
+     * Calculate Power Curve of Target 2 Columns 
+     * Formula: y = ax^r
+     *
      * @params columns double[][] columns x and y
      * @return double powCurve
      */
     public static double[] calculatePowerCurve(double[][] columns) {
-        double[] mb = calculateBestFitLine(columns);
-        double a = Math.pow(Math.E, mb[1]);
-        double b = mb[0];
+        double m, b, a;
+        double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+        for (double[] row : columns) {
+            sumX += Math.log(row[0]);
+            sumY += Math.log(row[1]);
+            sumXY += Math.log(row[0]) * Math.log(row[1]);
+            sumX2 += Math.pow(Math.log(row[0]), 2);
+        }
+
+        m = ((columns.length * sumXY) - (sumX * sumY))
+                / ((columns.length * sumX2) - (Math.pow(sumX, 2)));
+        b = (sumY - m * sumX) / columns.length;
+        
+        a = Math.pow(Math.E, b);
+
         double[] powCurve = new double[2];
         powCurve[0] = a;
-        powCurve[1] = b;
+        powCurve[1] = m;
         return powCurve;
     }
-    
+
     /**
-     * Calculate Logarithmic Curve of Target 2 Columns
+     * Calculate Logarithmic Curve of Target 2 Columns 
      * Formula: y = a*ln(x) + b
-     * 
+     *
      * @params columns double[][] columns x and y
-     * @return double logCurve
+     * @return double logCurve a, b
      */
     public static double[] calculateLogCurve(double[][] columns) {
-        double a, b;
+        double b, a;
         double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
 
         for (double[] row : columns) {
@@ -190,11 +218,11 @@ public class StaticMath {
         b = (sumY - a * sumX) / columns.length;
 
         double[] logCurve = new double[2];
-        logCurve[0] = a;
-        logCurve[1] = b;
+        logCurve[0] = b;
+        logCurve[1] = a;
 
         return logCurve;
-    }    
+    }
 
     /**
      * Calculate R-Squared Value for Linear Regression

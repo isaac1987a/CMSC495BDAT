@@ -218,8 +218,8 @@ public class StaticMath {
         r = (sumY - a * sumX) / columns.length;
 
         double[] logCurve = new double[2];
-        logCurve[0] = r;
-        logCurve[1] = a;
+        logCurve[0] = a;
+        logCurve[1] = r;
 
         return logCurve;
     }

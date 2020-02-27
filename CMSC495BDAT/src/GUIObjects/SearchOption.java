@@ -39,7 +39,7 @@ public class SearchOption extends JPanel implements ActionListener{
 	private JButton colorChooser2;
 	private Vector <SQLParameters> parametersVector;
 	private Vector <JPanel> addSubPanelVector;
-	public ComboItem searchType;
+	private ComboItem searchType;
 
 
 	public SearchOption(ComboItemDualString[] columns, int layerNumber , String option, ComboItem searchType) {
@@ -60,6 +60,7 @@ public class SearchOption extends JPanel implements ActionListener{
 	//CheckBox
 	//+- vertical Split
 	}
+	//Creates the horisontal bar with search data on it
 	private void createSearchBar(int layerNumber , String option) {
 		//JPanel searchTypePanel=new JPanel();
 		
@@ -90,6 +91,7 @@ public class SearchOption extends JPanel implements ActionListener{
 		colorChooser1 = new JButton(" ");
 		colorChooser1.setBackground(Color.RED);
 		add(colorChooser1,c );
+		//Calls the color chooser and sets the background color of a button
 		colorChooser1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				colorChooser1.setBackground(JColorChooser.showDialog(SearchOption.this, "Choose Background Color",colorChooser1.getBackground()));
@@ -114,6 +116,7 @@ public class SearchOption extends JPanel implements ActionListener{
 		colorChooser2 = new JButton(" ");
 		colorChooser2.setBackground(Color.BLUE);
 		add (colorChooser2,c);
+		//Calls the color chooser and sets the background color of a button
 		colorChooser1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				colorChooser2.setBackground(JColorChooser.showDialog(SearchOption.this, "Choose Background Color",colorChooser2.getBackground()));
@@ -122,7 +125,7 @@ public class SearchOption extends JPanel implements ActionListener{
 			
 		});
 		
-		addDisc();
+		addParameter();
 	
 		
 	}
@@ -155,7 +158,7 @@ public class SearchOption extends JPanel implements ActionListener{
 		addButton.setActionCommand(Integer.toString(i));
 		addButton.setForeground(Color.GREEN);
 		addButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
-				addDisc();
+				addParameter();
 				revalidate();
 				repaint();
 			}
@@ -191,7 +194,7 @@ public class SearchOption extends JPanel implements ActionListener{
 	}
 	
 	//add a parametersVector line and a set of add/delete buttons
-	private void addDisc() {
+	private void addParameter() {
 		//Create Random Key Value
 		Random rand = new Random();
 		int i=rand.nextInt();
@@ -287,5 +290,8 @@ public class SearchOption extends JPanel implements ActionListener{
 	}
 	public Color getColor2() {
 		return colorChooser2.getBackground();
+	}
+	public ComboItem getSearchType() {
+		return searchType;
 	}
 }

@@ -311,10 +311,12 @@ public class GUI extends JFrame{
 		io.updateSearchHistory(searchHistoryVector);
 		
 	}
+	
+	//Load Search from history
 	private void loadSearch(ComboItem searchItem) {
 		searchOptions=io.loadSearch(io.getCurrentDatabase(), searchItem.getKey());
-		searchSelectorBox.setSelectedItem(searchOptions.get(0).searchType);
+		searchSelectorBox.setSelectedItem(searchOptions.get(0).getSearchType());
 	}
-	//Set the Search Type
+	
 	
 }

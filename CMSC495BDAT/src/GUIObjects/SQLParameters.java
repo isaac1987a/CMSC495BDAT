@@ -22,7 +22,6 @@ public class SQLParameters extends JPanel{
 	public String columnName;
 	public String operator;
 	public double value;
-	//public String andOr;
 	public boolean valid = true;
 	
 	//Create GUI Elements

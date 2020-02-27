@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import GUIObjects.ComboItem;
+import GUIObjects.ComboItemDualString;
 import GUIObjects.SearchOption;
 
 public class InputOutput {
@@ -224,7 +225,14 @@ public class InputOutput {
      * @param dbName String Database Summary to be Loaded
      * @return String[] of "Column Min-Max" values
      */
-    public String[] loadColumnNames(String dbName) {
+    /**
+     * Loads any previously created CSV Summary file that contains column names
+     * with min and max values
+     *
+     * @param dbName String Database Summary to be Loaded
+     * @return ComboItemDualString[] of "Column Min-Max" values
+     */
+    public ComboItemDualString[] loadColumnNames(String dbName) {
 
         // Using Arraylist because initial size is unknown
         ArrayList<String> list = new ArrayList<>();
@@ -259,9 +267,12 @@ public class InputOutput {
             System.out.println("ERROR: " + ioe);
         }
 
-        // Convert ArrayList back to String Array
-        String[] dbSummary = new String[list.size()];
-        list.toArray(dbSummary);
+        // Convert ArrayList to ComboItemDualString[]
+        ComboItemDualString[] dbSummary = new ComboItemDualString[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            dbSummary[i] = new ComboItemDualString(list.get(i), Integer.toString(i));
+        }
+	    
         return dbSummary;
     }
 

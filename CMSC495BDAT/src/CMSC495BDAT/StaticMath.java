@@ -42,13 +42,14 @@ public class StaticMath {
      * @return double median
      */
     public static double calculateMedian(double[] column) {
-        Arrays.sort(column);
+        double[] columnCopy = column.clone();
+        Arrays.sort(columnCopy);
 
-        if (column.length % 2 != 0) {
-            return (double) column[column.length / 2];
+        if (columnCopy.length % 2 != 0) {
+            return (double) columnCopy[columnCopy.length / 2];
         }
-        return (double) (column[(column.length - 1) / 2]
-                + column[column.length / 2]) / 2.0;
+        return (double) (columnCopy[(columnCopy.length - 1) / 2]
+                + columnCopy[columnCopy.length / 2]) / 2.0;
     }
 
     /**

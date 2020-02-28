@@ -28,6 +28,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import CMSC495BDAT.CurveOptionEnum;
 import CMSC495BDAT.GUI;
 
 public class SearchOption extends JPanel implements ActionListener, Serializable{
@@ -36,7 +37,7 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 	private JComboBox <ComboItemDualString>columnsBox;
 	private JComboBox <ComboItemDualString>columnsBox2;
 	private JButton colorChooser1;
-	private JCheckBox additionalOption;
+	private JComboBox additionalOptionBox;
 	private JButton colorChooser2;
 	private Vector <SQLParameters> parametersVector;
 	private Vector <JPanel> addSubPanelVector;
@@ -106,8 +107,8 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 		c.gridx=GridBagConstraints.RELATIVE;
 		c.gridy=0;
 		c.insets = new Insets(0,0,0,0);
-		additionalOption = new JCheckBox("option");
-		add(additionalOption,c);
+		additionalOptionBox=new JComboBox(CurveOptionEnum.values());
+		add(additionalOptionBox,c);
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx=0.3;
@@ -256,7 +257,7 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 		searchType=item;
 		//Tabular View
 		if (searchType.getKey()==0) {
-			additionalOption.setVisible(false);
+			additionalOptionBox.setVisible(false);
 			colorChooser1.setVisible(false);
 			colorChooser2.setVisible(false);
 			columnsBox.setVisible(false);
@@ -269,7 +270,7 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 			colorChooser1.setVisible(true);
 			columnsBox.setVisible(true);
 			
-			additionalOption.setVisible(false);
+			additionalOptionBox.setVisible(false);
 			colorChooser2.setVisible(false);
 			columnsBox2.setVisible(false);
 			revalidate();
@@ -277,7 +278,7 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 		}
 		//dual variable charts
 		if (searchType.getKey()==2) {
-			additionalOption.setVisible(false);
+			additionalOptionBox.setVisible(true);
 			colorChooser1.setVisible(true);
 			colorChooser2.setVisible(true);
 			columnsBox.setVisible(true);
@@ -294,5 +295,8 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 	}
 	public ComboItem getSearchType() {
 		return searchType;
+	}
+	public String getOption() {
+		return additionalOptionBox.getSelectedItem().toString();
 	}
 }

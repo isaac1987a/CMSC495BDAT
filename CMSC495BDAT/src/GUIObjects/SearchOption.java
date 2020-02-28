@@ -294,7 +294,7 @@ public class SearchOption extends JPanel implements ActionListener{
 	public ComboItem getSearchType() {
 		return searchType;
 	}
-	public ComboItemDualString[] getColumns() {
+	public ComboItemDualString getColumns() {
 		return columns;
 	}
 }

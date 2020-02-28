@@ -18,9 +18,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -216,7 +220,7 @@ public class InputOutput {
         String[] fileContents = new String[contentsArray.size()];
         contentsArray.toArray(fileContents);
         this.createFile(dbName, fileName, fileContents);
-
+    }
     /**
      * Loads any previously created CSV Summary file that contains column names
      * with min and max values
@@ -277,9 +281,9 @@ public class InputOutput {
     public void saveSearch(Vector<SearchOption> searchOptions, int id) {
 
         String dbName = this.getCurrentDatabase();
-        String fileType = id + ".csv";
-
-        String col;
+        String fileType = id + ".ssv";
+        this.createFile(dbName, fileType, searchOptions);
+        /*String col;
         String col2;
         ComboItem searchType;
         String searchValue;
@@ -297,7 +301,7 @@ public class InputOutput {
         fileContents[0] = col + "," + col2 + "," + searchValue 
                 + "," + searchKey;
         
-        this.createFile(dbName, fileType, fileContents);
+        this.createFile(dbName, fileType, fileContents);*/
     }
 
     /**
@@ -308,9 +312,15 @@ public class InputOutput {
      * @return String thisSearch search to be loaded
      */
     public Vector<SearchOption> loadSearch(String dbName, int id) {
-
+    	Object obj = loadFile(dbName, id + ".ssv");
+    	if (obj==null) {
+    		return null;
+    	}
+    	else {
+    		return (Vector<SearchOption>)obj;
+    	}
         // Pull Previous Search from Text File if Exists
-        try {
+        /*try {
             fileReader = new BufferedReader(new FileReader(dbName + "\\"
                     + dbName + id + ".csv"));
             String line = fileReader.readLine();
@@ -335,7 +345,7 @@ public class InputOutput {
             System.out.println("ERROR: " + ioe);
         }
         // Return Null if File not Found
-        return null;
+        return null;*/
     }
 
     /**
@@ -356,6 +366,40 @@ public class InputOutput {
             System.out.println("ERROR: " + ioe);
         }
     }
+    
+    private void createFile(String dbName, String fileType,
+    	Object outputObject) {
+    	try {
+        	FileOutputStream fs = new FileOutputStream(dbName + "\\"+fileType, false);
+        	ObjectOutputStream out = new ObjectOutputStream(fs);
+        	out.writeObject(outputObject);
+        	out.close();
+        	fs.close();
+    	}
+    	catch(IOException ioe) {
+    		System.out.println("ERROR: " + ioe);
+    	}
+    }
+    
+    public Object loadFile(String dbName, String fileType)  {
+    	Object obj=new Object();
+    	try {
+    		FileInputStream fs = new FileInputStream(dbName + "\\"+fileType);
+    		ObjectInputStream in = new ObjectInputStream(fs);
+    		obj=in.readObject();
+    		in.close();
+    		fs.close();
+    	}
+    	catch(FileNotFoundException fne) {
+    		return null;
+    	} catch (IOException ioe) {
+    		System.out.println("ERROR: " + ioe);
+		} catch (ClassNotFoundException cnfe) {
+			System.out.println("ERROR: " + cnfe);
+		}
+    	return obj;
+    	
+    }
   
 	//Export DB Feature.  Save the DB to a new file or overwrite a file with the selected file
 	public void exportDB(double[][] valuesDatabase, File selectedFile) {
@@ -366,28 +410,35 @@ public class InputOutput {
 	//Have a persistant file that gets overwritten each time this is called.  This will be a vector with the names and keys
 	//Associate with current DB
 	public void updateSearchHistory(Vector<ComboItem> searchHistoryVector) {
-		// TODO Auto-generated method stub
-		
+		createFile(this.getCurrentDatabase(), "SearchHistory.shi", searchHistoryVector);
 	}
 	//Load the persistant search history file for the currently selected DB
 	public Vector<ComboItem> getSearchHistory() {
-		// TODO Auto-generated method stub
-		return null;
+		Object obj = loadFile(this.getCurrentDatabase(), "SearchHistory.shi");
+		System.out.println(obj.getClass());
+    	if (obj==null) {
+    		return null;
+    	}
+    	else {
+    		try {
+    			return Vector.class.cast(obj);
+    		}
+    		catch(Exception e) {
+    			return null;
+    		}	
+    	}
 	}
-	//Save this data to a file associated with the current DB and key id.
-	//The key will be sent to find the file at a later time
-	public void saveSearch(Vector<SearchOption> searchOptions, int id) {
-		// TODO Auto-generated method stub
-		
-	}
-	//Load the file associated with the current DB and id Key
-	public Vector<SearchOption> loadSearch(String currentDatabase, int key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 	//Delte the search history file associated with the key on the current DB
 		public void removeSearch(int key) {
-			// TODO Auto-generated method stub
+			File file = new File(this.getCurrentDatabase()+"\\"+key+".ssv");
+			if (file.delete())
+				System.out.println("File deleted successfully"); 
+			else
+				System.out.println("Failed to delete the file"); 
+	
+			
+		
 	}
 
 }

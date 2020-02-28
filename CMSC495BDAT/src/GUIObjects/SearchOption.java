@@ -16,6 +16,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.io.Serializable;
 import java.util.Random;
 import java.util.Vector;
 
@@ -29,7 +30,7 @@ import javax.swing.JPanel;
 
 import CMSC495BDAT.GUI;
 
-public class SearchOption extends JPanel implements ActionListener{
+public class SearchOption extends JPanel implements ActionListener, Serializable{
 	private ComboItemDualString[] columns;
 	GridBagLayout gridLayout = new GridBagLayout();
 	private JComboBox <ComboItemDualString>columnsBox;
@@ -294,7 +295,7 @@ public class SearchOption extends JPanel implements ActionListener{
 	public ComboItem getSearchType() {
 		return searchType;
 	}
-	public ComboItemDualString getColumns() {
+	/*public ComboItemDualString getColumns() {
 		return columns;
-	}
+	}*/
 }

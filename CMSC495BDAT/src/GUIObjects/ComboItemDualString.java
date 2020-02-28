@@ -1,6 +1,8 @@
 package GUIObjects;
 
-public class ComboItemDualString {
+import java.io.Serializable;
+
+public class ComboItemDualString implements Serializable{
 	private String str1;
 	private String str2;
 	public ComboItemDualString(String str1, String str2) {

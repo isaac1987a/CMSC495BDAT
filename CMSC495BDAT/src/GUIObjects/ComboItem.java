@@ -1,8 +1,10 @@
 package GUIObjects;
 
-public class ComboItem {
+import java.io.Serializable;
+
+public class ComboItem implements Serializable{
 	private String value;
-	private int key;
+	private Integer key;
 	
 	public ComboItem(String str, int i) {
 		value=str;

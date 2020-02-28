@@ -50,8 +50,7 @@ public class GUI extends JFrame{
 	private JComboBox<ComboItem> loadSearchBox = new JComboBox<ComboItem>();
 	
 	private InputOutput io = new InputOutput();
-	//private ComboItemDualString[] columnNames;
-	private String[] columnNames= {""};
+	private ComboItemDualString[] columnNames;
 	private SqlDatabase db = new SqlDatabase();
 	private Vector<ComboItem> searchHistoryVector= new Vector<ComboItem>();
 	
@@ -130,10 +129,7 @@ public class GUI extends JFrame{
 		
 		
 		//Add Search Grid
-		ComboItemDualString[] colNamesTemp = new ComboItemDualString[columnNames.length];
-		for (int i=0; i<columnNames.length; i++)
-			colNamesTemp[i]=new ComboItemDualString(columnNames[i], Integer.toString(i));
-		searchOptions.add(new SearchOption(colNamesTemp, 0, "nowhere", (ComboItem)searchSelectorBox.getSelectedItem()));
+		searchOptions.add(new SearchOption(columnNames, 0, "nowhere", (ComboItem)searchSelectorBox.getSelectedItem()));
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weightx=1;
 		c.gridx=0;
@@ -190,7 +186,6 @@ public class GUI extends JFrame{
 		//check for previously used DB and load
 		if (!(io.getCurrentDatabase()==null||(!io.getCurrentDatabase().matches("[A-Za-z][A-Za-z0-9]+")))) {
 			db.selectDatabase(io.getCurrentDatabase());
-			columnNames=db.getColumnDatabase();
 			createMainWindow();
 		}
 		else {
@@ -213,7 +208,7 @@ public class GUI extends JFrame{
 		accept.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
 			db.selectDatabase(String.valueOf(dbList.getSelectedItem()));
 			io.setCurrentDatabase(String.valueOf(dbList.getSelectedItem()));
-			columnNames=db.getColumnDatabase();
+			columnNames=io.loadColumnNames(io.getCurrentDatabase());
 			createMainWindow();
 			
 			//Clean up this window
@@ -248,7 +243,7 @@ public class GUI extends JFrame{
 			//Parse File and set DB Names
 			io.parseFile(csvFile, nameBox.getText());
 			db.selectDatabase(io.getCurrentDatabase());
-			columnNames=db.getColumnDatabase();
+			columnNames=io.loadColumnNames(io.getCurrentDatabase());
 			createMainWindow();
 			
 			//Clean up this window

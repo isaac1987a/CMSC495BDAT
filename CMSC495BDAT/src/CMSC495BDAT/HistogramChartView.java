@@ -1,4 +1,4 @@
- package CMSC495BDAT;
+package CMSC495BDAT;
 /*  File: HistogramChartView.java
     Author: Justin Rhodes
     Date: 23 February 2020
@@ -66,13 +66,16 @@ public class HistogramChartView extends AbstractChartView {
   private double binSize = 1;
   private double[] histogram;
 
+  private Color displayColor = Color.GRAY;
+
   /** Constructor that includes column names */
   public HistogramChartView(JFrame parentFrame, double[] yData, SearchOption searchOption) {
     super(parentFrame);
     this.yData = yData;
     this.xData = getIndexVector(yData.length); // give it a 1:n index
     this.colName = searchOption.getColumn();
-    
+    this.displayColor = searchOption.getColor1();
+
     calculateHistogram();
     
     setTitle("Histogram Plot");
@@ -103,8 +106,9 @@ public class HistogramChartView extends AbstractChartView {
     chart.getStyler().setToolTipsEnabled(true);
 
     // add histogram series
-    chart.addSeries(colName, bins, histogram);
-
+    CategorySeries series = chart.addSeries(colName, bins, histogram);
+    series.setFillColor(this.displayColor);
+    
     // add normal distribution curve
     CategorySeries normalSeries = chart.addSeries("Normal distribution", bins, getNormalCurve());
     normalSeries.setYAxisGroup(1); // put on second axes

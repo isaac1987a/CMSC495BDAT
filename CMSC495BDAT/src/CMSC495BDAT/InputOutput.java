@@ -203,7 +203,7 @@ public class InputOutput {
      * Saves Summary Information to CSV File in DB Folder
      */
     private void saveColumnNames(String dbName) {
-        ArrayList<String> contentsArray = new ArrayList<>();
+        Vector<ComboItemDualString> contentsArray = new Vector<ComboItemDualString>();
 
         String fileName = "Summary.csv";
 
@@ -212,14 +212,10 @@ public class InputOutput {
 
         // Contents of Summary Info
         for (int i = 0; i < headers.length; i++) {
-            contentsArray.add(headers[i] + "," + minValues[i] + ","
-                    + maxValues[i]);
+            contentsArray.add(new ComboItemDualString(headers[i], minValues[i] + "-"+maxValues[i]));
         }
-
-        // Create CSV with Summary Info
-        String[] fileContents = new String[contentsArray.size()];
-        contentsArray.toArray(fileContents);
-        this.createFile(dbName, fileName, fileContents);
+        
+        this.createFile(dbName, fileName, contentsArray.toArray());
     }
     /**
      * Loads any previously created CSV Summary file that contains column names
@@ -229,9 +225,11 @@ public class InputOutput {
      * @return ComboItemDualString[] of "Column Min-Max" values
      */
     public ComboItemDualString[] loadColumnNames(String dbName) {
+    	return (ComboItemDualString[]) loadFile(dbName, "Summary.csv");
+    }
 
         // Using Arraylist because initial size is unknown
-        ArrayList<String> list = new ArrayList<>();
+        /*ArrayList<String> list = new ArrayList<>();
 
         try {
             String line;
@@ -241,7 +239,7 @@ public class InputOutput {
                     new FileInputStream(file), "UTF-8"));
 
             /* Get rid of UTF-8 BOM issue for bug #2. -sdr */
-            fileReader.mark(1);
+            /*fileReader.mark(1);
             if (fileReader.read() != 0xFEFF) {
                 fileReader.reset();
             }
@@ -355,7 +353,7 @@ public class InputOutput {
      * @param fileType String File Name (e.g. "Summary.csv", ".txt", etc)
      * @param fileContents String[] File Contents
      */
-    private void createFile(String dbName, String fileType,
+    /*private void createFile(String dbName, String fileType,
             String[] fileContents) {
         try (PrintWriter pw = new PrintWriter(dbName + "\\" + dbName
                 + fileType)) {
@@ -365,10 +363,11 @@ public class InputOutput {
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
         }
-    }
+    }*/
     
     private void createFile(String dbName, String fileType,
     	Object outputObject) {
+    	System.out.println(dbName+","+fileType+","+outputObject.toString());
     	try {
         	FileOutputStream fs = new FileOutputStream(dbName + "\\"+fileType, false);
         	ObjectOutputStream out = new ObjectOutputStream(fs);
@@ -382,7 +381,13 @@ public class InputOutput {
     }
     
     public Object loadFile(String dbName, String fileType)  {
+    	System.out.println("Load File "+dbName+" "+fileType);
     	Object obj=new Object();
+    	//Check if the file exists
+    	File file = new File(dbName + "\\"+fileType);
+    	if (!file.exists()) {
+    		return null;
+    	}
     	try {
     		FileInputStream fs = new FileInputStream(dbName + "\\"+fileType);
     		ObjectInputStream in = new ObjectInputStream(fs);
@@ -398,7 +403,6 @@ public class InputOutput {
 			System.out.println("ERROR: " + cnfe);
 		}
     	return obj;
-    	
     }
   
 	//Export DB Feature.  Save the DB to a new file or overwrite a file with the selected file
@@ -415,7 +419,6 @@ public class InputOutput {
 	//Load the persistant search history file for the currently selected DB
 	public Vector<ComboItem> getSearchHistory() {
 		Object obj = loadFile(this.getCurrentDatabase(), "SearchHistory.shi");
-		System.out.println(obj.getClass());
     	if (obj==null) {
     		return null;
     	}

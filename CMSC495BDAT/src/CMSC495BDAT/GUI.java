@@ -183,6 +183,7 @@ public class GUI extends JFrame{
 	}
 	//pre GUI commands
 	private void startup() {
+		System.out.println("Startup");
 		//check for previously used DB and load
 		if (!(io.getCurrentDatabase()==null||(!io.getCurrentDatabase().matches("[A-Za-z][A-Za-z0-9]+")))) {
 			db.selectDatabase(io.getCurrentDatabase());

@@ -277,44 +277,65 @@ public class InputOutput {
     }
 
     /**
-     * Saves Search as New Text File for Future Reference
+     * Save Searches as CSV File for Future Reference
      *
-     * @param dbName String Database Name
-     * @param searchName String Name of Search
-     * @param searchInfo String Information contained in Search
+     * @param searchOptions Vector
+     * @param id int key id
      */
-    
-    public void saveSearch(String dbName, String searchName, String searchInfo) {
-        String fileType = searchName + ".txt";
-        // Create String[] for createFile param.
-        String[] search = new String[1];
-        search[0] = searchInfo;
-        this.createFile(dbName, fileType, search);
+    public void saveSearch(Vector<SearchOption> searchOptions, int id) {
+
+        String dbName = this.getCurrentDatabase();
+        String fileType = id + ".csv";
+
+        String col;
+        String col2;
+        ComboItem searchType;
+        String searchValue;
+        String searchKey;
+
+        String[] fileContents = new String[1];
+
+        // Separate each SearchOption into parts, save in CSV
+        col = searchOptions.getColumns().getColumnName();    // first string of comboitem
+        col2 = searchOptions.getColumns().getMinMax();       // second string of comboitem
+        searchType = searchOptions.getSearchType;            // get SearchType
+        searchValue = searchType.getValue();                 // string of search type
+        searchKey = searchType.getKey();                     // int of search type
+            
+        fileContents[0] = col + "," + col2 + "," + searchValue 
+                + "," + searchKey;
+        
+        this.createFile(dbName, fileType, fileContents);
     }
 
     /**
-     * Loads Search from Text File.
+     * Loads Search from CSV File.
      *
      * @param dbName String Database Name
-     * @param searchName String Name of Search
+     * @param id int search id
      * @return String thisSearch search to be loaded
      */
-
-    public String[] loadSearch(String dbName, String searchName) {
-
-        ArrayList<String> searchList = new ArrayList<>();
+    public Vector<SearchOption> loadSearch(String dbName, int id) {
 
         // Pull Previous Search from Text File if Exists
         try {
             fileReader = new BufferedReader(new FileReader(dbName + "\\"
-                    + dbName + searchName + ".txt"));
-            String line;
-            while ((line = fileReader.readLine()) != null) {
-                searchList.add(line);
-            }
-            String[] searchInfo = new String[searchList.size()];
-            searchList.toArray(searchInfo);
-            return searchInfo;
+                    + dbName + id + ".csv"));
+            String line = fileReader.readLine();
+            String[] tempArray = line.split(DELIMITER);
+            
+            String col = tempArray[0];
+            String col2 = tempArray[1];
+            String searchValue = tempArray[2];
+            String tempKey = tempArray[3];
+            int searchKey = Integer.parseInt(tempKey);
+            
+            ComboItemDualString[] columns = new ComboItemDualString(col, col2);
+            ComboItem[] searchType = new ComboItem(searchValue, searchKey);
+            
+            SearchOption searchOptions = new SearchOption(columns, searchType);
+            return searchOptions;
+            
         } catch (FileNotFoundException fnf) {
             System.out.println("ERROR: No search found with that name.");
             return null;

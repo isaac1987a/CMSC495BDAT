@@ -125,7 +125,7 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 			}
 			
 		});
-		
+		setSearchType(searchType);
 		addParameter();
 	
 		
@@ -295,7 +295,4 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 	public ComboItem getSearchType() {
 		return searchType;
 	}
-	/*public ComboItemDualString getColumns() {
-		return columns;
-	}*/
 }

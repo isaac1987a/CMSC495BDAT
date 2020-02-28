@@ -47,7 +47,7 @@ public class GUI extends JFrame{
 	private JComboBox<ComboItem> searchSelectorBox=new JComboBox<ComboItem>(types);
 	private JPanel searchPanel=new JPanel();
 	private JButton searchButton= new JButton("Search");
-	private JComboBox<ComboItem> loadSearchBox = new JComboBox<ComboItem>();
+	private JComboBox<ComboItem> searchHistoryComboBox = new JComboBox<ComboItem>();
 	
 	private InputOutput io = new InputOutput();
 	private ComboItemDualString[] columnNames;
@@ -67,13 +67,7 @@ public class GUI extends JFrame{
 		remove(searchPanel);
 		//Reset Everything
 		searchPanel=new JPanel();
-		//Get current search history
-		if (io.getSearchHistory()!=null) {
-			searchHistoryVector=io.getSearchHistory();
-		}
-		else {
-			searchHistoryVector=new Vector<ComboItem>();
-		}
+	
 		//Set Window Size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setSize(screenSize.height/2,screenSize.width/3);
@@ -155,6 +149,15 @@ public class GUI extends JFrame{
 			}
 			
 		});
+		
+		//Get current search history
+		if (io.getSearchHistory()!=null) {
+			searchHistoryVector=io.getSearchHistory();
+			searchHistoryComboBox = new JComboBox<ComboItem>(searchHistoryVector);
+		}
+		else {
+			searchHistoryVector=new Vector<ComboItem>();
+		}
 		//Search History Box
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx=GridBagConstraints.RELATIVE;
@@ -162,11 +165,11 @@ public class GUI extends JFrame{
 		c.gridx=0;
 		c.ipady=20;
 		c.gridwidth=1;
-		searchPanel.add(loadSearchBox,c);
+		searchPanel.add(searchHistoryComboBox,c);
 		
 		
 		
-		//Load Search Test Button
+		//Load Search Button
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx=GridBagConstraints.RELATIVE;
 		c.weightx=1;
@@ -176,7 +179,7 @@ public class GUI extends JFrame{
 		JButton loadButton = new JButton("Load");
 		loadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				loadSearch((ComboItem)loadSearchBox.getSelectedItem());		
+				loadSearch((ComboItem)searchHistoryComboBox.getSelectedItem());		
 			}
 		});
 		searchPanel.add(loadButton,c);
@@ -302,11 +305,11 @@ public class GUI extends JFrame{
 		//Control the size of the search
 		if (searchHistoryVector.size()>9){
 			io.removeSearch(searchHistoryVector.get(0).getKey());
-			loadSearchBox.remove(0);
+			searchHistoryComboBox.remove(0);
 			searchHistoryVector.remove(0);
 		}
 		searchHistoryVector.add(new ComboItem(searchOptions.get(0).createSearchString(), id));
-		loadSearchBox.addItem(searchHistoryVector.get(searchHistoryVector.size()-1));
+		searchHistoryComboBox.addItem(searchHistoryVector.get(searchHistoryVector.size()-1));
 		io.saveSearch(searchOptions, id);
 		io.updateSearchHistory(searchHistoryVector);
 		
@@ -316,6 +319,7 @@ public class GUI extends JFrame{
 	private void loadSearch(ComboItem searchItem) {
 		searchOptions=io.loadSearch(io.getCurrentDatabase(), searchItem.getKey());
 		searchSelectorBox.setSelectedItem(searchOptions.get(0).getSearchType());
+		createMainWindow();
 	}
 	
 	

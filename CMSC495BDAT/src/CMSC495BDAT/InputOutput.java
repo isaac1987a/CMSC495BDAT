@@ -216,15 +216,7 @@ public class InputOutput {
         String[] fileContents = new String[contentsArray.size()];
         contentsArray.toArray(fileContents);
         this.createFile(dbName, fileName, fileContents);
-    }
 
-    /**
-     * Loads any previously created CSV Summary file that contains column names
-     * with min and max values
-     *
-     * @param dbName String Database Summary to be Loaded
-     * @return String[] of "Column Min-Max" values
-     */
     /**
      * Loads any previously created CSV Summary file that contains column names
      * with min and max values

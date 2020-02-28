@@ -68,8 +68,12 @@ public class GUI extends JFrame{
 		//Reset Everything
 		searchPanel=new JPanel();
 		//Get current search history
-		searchHistoryVector=(io.getSearchHistory()!=null) ? io.getSearchHistory() : new Vector<ComboItem>();
-		
+		if (io.getSearchHistory()!=null) {
+			searchHistoryVector=io.getSearchHistory();
+		}
+		else {
+			searchHistoryVector=new Vector<ComboItem>();
+		}
 		//Set Window Size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setSize(screenSize.height/2,screenSize.width/3);
@@ -183,16 +187,15 @@ public class GUI extends JFrame{
 	}
 	//pre GUI commands
 	private void startup() {
-		System.out.println("Startup");
 		//check for previously used DB and load
-		if (!(io.getCurrentDatabase()==null||(!io.getCurrentDatabase().matches("[A-Za-z][A-Za-z0-9]+")))) {
+		if (!(io.getCurrentDatabase()==null)) {
 			db.selectDatabase(io.getCurrentDatabase());
+			columnNames=io.loadColumnNames(io.getCurrentDatabase());
 			createMainWindow();
 		}
 		else {
 			dbSelectionMenu();
 		}
-		columnNames=io.loadColumnNames(io.getCurrentDatabase());
 	}
 	//create menu to select or create DB
 	private void dbSelectionMenu() {
@@ -295,6 +298,7 @@ public class GUI extends JFrame{
 		//Generate search ID
 		Random rand = new Random();
 		int id=rand.nextInt();
+		id = (id<0) ? id*-1 : id;
 		//Control the size of the search
 		if (searchHistoryVector.size()>9){
 			io.removeSearch(searchHistoryVector.get(0).getKey());

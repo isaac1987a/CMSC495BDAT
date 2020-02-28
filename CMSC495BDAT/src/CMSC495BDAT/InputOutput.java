@@ -189,6 +189,7 @@ public class InputOutput {
             String currentDB = fileReader.readLine();
             return currentDB;
         } catch (FileNotFoundException fnf) {
+        	System.out.println("DB File Not Found");
             System.out.println("ERROR: No Current Database. Creating File...");
             this.setCurrentDatabase("");
             return null;
@@ -203,7 +204,7 @@ public class InputOutput {
      * Saves Summary Information to CSV File in DB Folder
      */
     private void saveColumnNames(String dbName) {
-        Vector<ComboItemDualString> contentsArray = new Vector<ComboItemDualString>();
+        ArrayList<ComboItemDualString> contentsArray = new ArrayList<ComboItemDualString>();
 
         String fileName = "Summary.csv";
 
@@ -212,10 +213,11 @@ public class InputOutput {
 
         // Contents of Summary Info
         for (int i = 0; i < headers.length; i++) {
-            contentsArray.add(new ComboItemDualString(headers[i], minValues[i] + "-"+maxValues[i]));
+            contentsArray.add(new ComboItemDualString(headers[i], minValues[i] + "-" + maxValues[i]));
         }
-        
-        this.createFile(dbName, fileName, contentsArray.toArray());
+        ComboItemDualString[] comboItemArray=new ComboItemDualString[contentsArray.size()];
+        comboItemArray=contentsArray.toArray(comboItemArray);
+        this.createFile(dbName, fileName, comboItemArray);
     }
     /**
      * Loads any previously created CSV Summary file that contains column names
@@ -367,7 +369,6 @@ public class InputOutput {
     
     private void createFile(String dbName, String fileType,
     	Object outputObject) {
-    	System.out.println(dbName+","+fileType+","+outputObject.toString());
     	try {
         	FileOutputStream fs = new FileOutputStream(dbName + "\\"+fileType, false);
         	ObjectOutputStream out = new ObjectOutputStream(fs);
@@ -381,7 +382,6 @@ public class InputOutput {
     }
     
     public Object loadFile(String dbName, String fileType)  {
-    	System.out.println("Load File "+dbName+" "+fileType);
     	Object obj=new Object();
     	//Check if the file exists
     	File file = new File(dbName + "\\"+fileType);

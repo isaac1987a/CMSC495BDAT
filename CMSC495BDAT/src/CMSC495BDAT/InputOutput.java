@@ -330,10 +330,10 @@ public class InputOutput {
         try {
             StringBuilder sb = new StringBuilder();
             
-            for (double[] valuesDatabase1 : valuesDatabase) {
-                for (int j = 0; j < valuesDatabase1.length; j++) {
-                    sb.append(valuesDatabase1[j]+"");
-                    if (j < valuesDatabase1.length - 1) {
+            for (int i = 0; i < valuesDatabase.length; i++) {
+                for (int j = 0; j < valuesDatabase[i].length; j++) {
+                    sb.append(valuesDatabase[i][j]+"");
+                    if (j < valuesDatabase[i].length - 1) {
                         sb.append(",");
                     }
                 }

@@ -294,7 +294,7 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 	public ComboItem getSearchType() {
 		return searchType;
 	}
-	public String getOption() {
-		return additionalOptionBox.getSelectedItem().toString();
+	public CurveOptionEnum getOption() {
+		return CurveOptionEnum.valueOf(additionalOptionBox.getSelectedItem().toString());
 	}
 }

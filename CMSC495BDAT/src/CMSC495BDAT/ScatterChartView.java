@@ -79,15 +79,13 @@ public class ScatterChartView extends AbstractChartView {
   }
 
   /** Constructor for 2 variable view */
-  public ScatterChartView(JFrame parentFrame, double[] xData, String xName, 
-                                              double[] yData, String yName, 
-                                              SearchOption searchOption) {
+  public ScatterChartView(JFrame parentFrame, double[] xData, double[] yData,  SearchOption searchOption) {
     super(parentFrame);
     this.crossPlot = true; // mark this as a single variable plot
     this.yData = yData;
     this.xData = xData;
-    this.yName = yName;
-    this.xName = xName;
+    this.yName = searchOption.getColumn();
+    this.xName = searchOption.getColumn2();
     this.curveOption = searchOption.getOption();
     this.displayColor = searchOption.getColor1();
 
@@ -259,7 +257,7 @@ public class ScatterChartView extends AbstractChartView {
 
 
   /** Testing: show chart */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 
     JFrame testFrame = new JFrame();
     testFrame.setTitle("TEST launcher: ScatterChartView");
@@ -278,6 +276,6 @@ public class ScatterChartView extends AbstractChartView {
                                                              csv.getColumn(4), csv.getColumnName(4),
                                                              CurveOptionEnum.Power);
     test2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // kills app directly in this mode
-	}
+	}*/
 
 }

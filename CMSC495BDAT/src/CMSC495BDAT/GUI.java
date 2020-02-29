@@ -288,8 +288,8 @@ public class GUI extends JFrame{
 			return;
 		}
 		if (String.valueOf(searchSelectorBox.getSelectedItem()).equals("Scatter Plot")) {
-			ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getColumn(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0).getColumn(), db.getValuesDatabase(searchOptions.get(0).getColumn2(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0).getColumn2());
-			//ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getColumn(), searchOptions.get(0).getSQLParameters()), db.getValuesDatabase(searchOptions.get(0).getColumn2(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0));
+			//ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getColumn(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0).getColumn(), db.getValuesDatabase(searchOptions.get(0).getColumn2(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0).getColumn2());
+			ScatterChartView chart = new ScatterChartView(displayFrame, db.getValuesDatabase(searchOptions.get(0).getColumn(), searchOptions.get(0).getSQLParameters()), db.getValuesDatabase(searchOptions.get(0).getColumn2(), searchOptions.get(0).getSQLParameters()), searchOptions.get(0));
 			return;
 		}
 		

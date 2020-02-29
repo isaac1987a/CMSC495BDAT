@@ -154,11 +154,11 @@ public class GUI extends JFrame{
 		//Get current search history
 		if (io.getSearchHistory()!=null) {
 			searchHistoryVector=io.getSearchHistory();
-			searchHistoryComboBox = new JComboBox<ComboItem>(searchHistoryVector);
 		}
 		else {
 			searchHistoryVector=new Vector<ComboItem>();
 		}
+		searchHistoryComboBox = new JComboBox<ComboItem>(searchHistoryVector);
 		//Search History Box
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx=GridBagConstraints.RELATIVE;
@@ -317,14 +317,18 @@ public class GUI extends JFrame{
 		Random rand = new Random();
 		int id=rand.nextInt();
 		id = (id<0) ? id*-1 : id;
-		//Control the size of the search
+		
+		//Add Item to top of the vector
+		searchHistoryVector.add(0, new ComboItem(searchOptions.get(0).createSearchString(), id));
+		//Remove items if there are more than 10 searches
 		if (searchHistoryVector.size()>9){
-			io.removeSearch(searchHistoryVector.get(0).getKey());
-			searchHistoryComboBox.remove(0);
-			searchHistoryVector.remove(0);
+			io.removeSearch(searchHistoryVector.get(searchHistoryVector.size()-1).getKey());
+			searchHistoryVector.remove(searchHistoryVector.size()-1);
 		}
-		searchHistoryVector.add(new ComboItem(searchOptions.get(0).createSearchString(), id));
-		searchHistoryComboBox.addItem(searchHistoryVector.get(searchHistoryVector.size()-1));
+		searchHistoryComboBox.setSelectedIndex(0);
+		searchHistoryComboBox.revalidate();
+		searchHistoryComboBox.repaint();
+		//Push updated search to storage
 		io.saveSearch(searchOptions, id);
 		io.updateSearchHistory(searchHistoryVector);
 		

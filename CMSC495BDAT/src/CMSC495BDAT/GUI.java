@@ -340,6 +340,5 @@ public class GUI extends JFrame{
 		searchSelectorBox.setSelectedItem(searchOptions.get(0).getSearchType());
 		createMainWindow();
 	}
-	
-	
+		
 }

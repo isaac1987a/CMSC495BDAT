@@ -11,9 +11,8 @@ package CMSC495BDAT;
 // java -classpath ".;.\xchart-3.6.1\xchart-3.6.1.jar" ScatterChartView
 
 /* Public Methods
-    ScatterChartView(JFrame parentFrame, double[] yData, String yName, SearchOption searchOption)
-    ScatterChartView(JFrame parentFrame, double[] xData, String xName, 
-                                         double[] yData, String yName, SearchOption searchOption)
+    ScatterChartView(JFrame parentFrame, double[] yData, SearchOption searchOption)
+    ScatterChartView(JFrame parentFrame, double[] xData, double[] yData, SearchOption searchOption)
 */
 
 import java.awt.BorderLayout;
@@ -61,19 +60,20 @@ public class ScatterChartView extends AbstractChartView {
   private double[] fitParams = null;
 
   private CurveOptionEnum curveOption = CurveOptionEnum.Linear;
-  private Color displayColor = Color.GRAY;
+  private Color displayColor1 = Color.GRAY;
+  private Color displayColor2 = Color.GRAY;
 
   /** Constructor for single variable view */
-  public ScatterChartView(JFrame parentFrame, double[] yData, String yName,
-                                              SearchOption searchOption) {
+  public ScatterChartView(JFrame parentFrame, double[] yData, SearchOption searchOption) {
     super(parentFrame);
     this.crossPlot = false; // mark this as a single variable plot
     this.yData = yData;
     this.xData = getIndexVector(yData.length);
-    this.yName = yName;
+    this.yName = searchOption.getColumn();
     this.xName = "Row Number";
     this.curveOption = searchOption.getOption();
-    this.displayColor = searchOption.getColor1();
+    this.displayColor1 = searchOption.getColor1();
+    this.displayColor2 = searchOption.getColor2();
 
     constructChart();
   }
@@ -84,11 +84,12 @@ public class ScatterChartView extends AbstractChartView {
     this.crossPlot = true; // mark this as a single variable plot
     this.yData = yData;
     this.xData = xData;
-    this.yName = searchOption.getColumn();
-    this.xName = searchOption.getColumn2();
+    this.yName = searchOption.getColumn2();
+    this.xName = searchOption.getColumn();
     this.curveOption = searchOption.getOption();
-    this.displayColor = searchOption.getColor1();
-
+    this.displayColor1 = searchOption.getColor1();
+    this.displayColor2 = searchOption.getColor2();
+    
     constructChart();
   }
 
@@ -122,41 +123,46 @@ public class ScatterChartView extends AbstractChartView {
     XYSeries dataSeries = chart.addSeries("Data values", xData, yData);
     dataSeries.setLineStyle(SeriesLines.NONE);
     dataSeries.setMarker(SeriesMarkers.CIRCLE);
-    dataSeries.setMarkerColor(displayColor);
+    dataSeries.setMarkerColor(displayColor1);
     
     // Show the linear fit series too
     XYSeries fitSeries = getDataFitSeries(chart);
-    fitSeries.setLineColor(Color.RED);
+    fitSeries.setLineColor(displayColor2);
     fitSeries.setLineStyle(SeriesLines.SOLID);
     fitSeries.setLineWidth(5);
     fitSeries.setMarker(SeriesMarkers.SQUARE);
+    fitSeries.setMarkerColor(displayColor2);
 
     // add the chart into the swing panel
     JPanel chartPanel = new XChartPanel<XYChart>(chart);
     leftPane.add(chartPanel, BorderLayout.CENTER);
   }
 
-  /** build approriate fit series for the chart */
+  /** build appropriate fit series for the chart */
   private XYSeries getDataFitSeries(XYChart chart) {
     XYSeries series = null;
 
+    // make a sorted x index value to use for the fit line
+    double[] xIndex = xData.clone();
+    Arrays.sort(xIndex);
+    
     switch(curveOption) {
       case Exponential:
         fitParams = StaticMath.calculateExponentialCurve(combineVectors(xData, yData));
-        series = chart.addSeries("Exponential fit", xData, calculateExponetialFitLineValues());
+        series = chart.addSeries("Exponential fit", xIndex, calculateExponetialFitLineValues(xIndex));
         break;
       case Power:
         fitParams = StaticMath.calculatePowerCurve(combineVectors(xData, yData));
-        series = chart.addSeries("Power fit", xData, calculatePowerFitLineValues());
+        series = chart.addSeries("Power fit", xIndex, calculatePowerFitLineValues(xIndex));
         break;
       case Logarithimic:
         fitParams = StaticMath.calculateLogCurve(combineVectors(xData, yData));
-        series = chart.addSeries("Logarithimic fit", xData, calculateLogFitLineValues());
+        series = chart.addSeries("Logarithimic fit", xIndex, calculateLogFitLineValues(xIndex));
         break;
       case Linear: // fall through for default
       default: 
         fitParams = StaticMath.calculateBestFitLine(combineVectors(xData, yData));
-        series = chart.addSeries("Linear fit", xData, calculateLinearFitLineValues());
+        series = chart.addSeries("Linear fit", xIndex, calculateLinearFitLineValues(xIndex));
         break;
     }
     return series;
@@ -212,45 +218,45 @@ public class ScatterChartView extends AbstractChartView {
   }
 
   /** Use the linear fit to calculate y values */
-  private double[] calculateLinearFitLineValues() {
-    double[] y = new double[xData.length];
+  private double[] calculateLinearFitLineValues(double[] xIndex) {
+    double[] y = new double[xIndex.length];
     double m = fitParams[0];
     double b = fitParams[1];
-    for (int i=0; i < xData.length; i++) {
-      y[i] = m * xData[i] + b;  // y = mx + b
+    for (int i=0; i < xIndex.length; i++) {
+      y[i] = m * xIndex[i] + b;  // y = mx + b
     }
     return y;
   }
 
   /** Use the exponential fit to calculate y values */
-  private double[] calculateExponetialFitLineValues() {
-    double[] y = new double[xData.length];
+  private double[] calculateExponetialFitLineValues(double[] xIndex) {
+    double[] y = new double[xIndex.length];
     double a = fitParams[0];
     double r = fitParams[1];
-    for (int i=0; i < xData.length; i++) {
-      y[i] =a * Math.pow(r, xData[i]); // y = ar^x
+    for (int i=0; i < xIndex.length; i++) {
+      y[i] =a * Math.pow(r, xIndex[i]); // y = ar^x
     }
     return y;
   }
 
   /** Use the power fit to calculate y values */
-  private double[] calculatePowerFitLineValues() {
-    double[] y = new double[xData.length];
+  private double[] calculatePowerFitLineValues(double[] xIndex) {
+    double[] y = new double[xIndex.length];
     double a = fitParams[0];
     double r = fitParams[1];
-    for (int i=0; i < xData.length; i++) {
-      y[i] = a * Math.pow(xData[i], r); // y = ax^r
+    for (int i=0; i < xIndex.length; i++) {
+      y[i] = a * Math.pow(xIndex[i], r); // y = ax^r
     }
     return y;
   }
 
   /** Use the log fit to calculate y values */
-  private double[] calculateLogFitLineValues() {
-    double[] y = new double[xData.length];
+  private double[] calculateLogFitLineValues(double[] xIndex) {
+    double[] y = new double[xIndex.length];
     double a = fitParams[0];
     double r = fitParams[1];
-    for (int i=0; i < xData.length; i++) {
-      y[i] = a * Math.log(xData[i]) + r; // y = a*ln(x) + r
+    for (int i=0; i < xIndex.length; i++) {
+      y[i] = a * Math.log(xIndex[i]) + r; // y = a*ln(x) + r
     }
     return y;
   }

@@ -13,6 +13,8 @@ package CMSC495BDAT;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.text.Format;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -88,6 +90,13 @@ abstract class AbstractChartView extends JFrame {
       combined[i][0] = x[i];
       combined[i][1] = y[i];
     }
+    // sort the x,y values just in case - makes plotting better
+    Arrays.sort(combined, new Comparator<double[]>() {
+      public int compare(double[] a, double[] b) {
+          return Double.compare(a[0], b[0]);
+      }
+    });
+
     return combined;
   }
 

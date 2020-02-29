@@ -121,6 +121,8 @@ public class InputOutput {
             System.out.println("ERROR: File Not Found.");
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
+        } catch (InvalidFileTypeException ift) {
+            System.out.println("ERROR: " + ift);
         }
 
         for (int i = 0; i < headers.length; i++) {

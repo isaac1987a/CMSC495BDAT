@@ -59,15 +59,7 @@ public class SQLParameters extends JPanel{
 		c.gridy=0;
 		entryField.setColumns(15);
 		add(entryField,c);
-		
-		
-		c.weightx=2.0;
-		c.weighty=1.0;
-		c.gridx=GridBagConstraints.RELATIVE;
-		c.gridy=0;
-		entryField.setColumns(10);
-		add(entryField,c);
-		
+				
 		
 		/*c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx=.5;

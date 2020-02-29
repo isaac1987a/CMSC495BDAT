@@ -202,15 +202,19 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 		GridBagConstraints c = new GridBagConstraints();
 		//add the discriminator Panel
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx=.9;
+		c.weightx=2.0;
 		c.gridx=0;
-		c.gridy=GridBagConstraints.RELATIVE;		
+		c.gridy=GridBagConstraints.RELATIVE;
+		c.gridwidth=3;
 		parametersVector.add(new SQLParameters(columns, i));
 		add(parametersVector.get(parametersVector.size()-1),c);
+		
 		//add the addition/removal panel
-		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx=.1;
+		c.gridwidth=1;
 		c.gridx=GridBagConstraints.RELATIVE;
+		c.gridwidth=1;
+		//c.gridx=GridBagConstraints.RELATIVE;
 		c.gridy=parametersVector.size();
 		add(createAddSubPanel(i), c);
 	}

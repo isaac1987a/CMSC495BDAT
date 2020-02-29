@@ -1,7 +1,9 @@
 /*
  * SearchType
  * By Isaac Blach
- * Displays and stores data about the desired graph.  Contains Vector of SQLParameters
+ * Displays and stores data about the desired graph.  
+ * Contains Vector of SQLParameters
+ * 29 Feb 2020
  */
 
 package GUIObjects;

@@ -1,6 +1,7 @@
 /*Gui
  * By Isaac Blach
  * Creates Core GUI and calls other classes to perform various functions
+ * 29 Feb 2020
  */
 
 
@@ -191,10 +192,16 @@ public class GUI extends JFrame{
 	//pre GUI commands
 	private void startup() {
 		//check for previously used DB and load
-		if (!(io.getCurrentDatabase()==null)) {
-			db.selectDatabase(io.getCurrentDatabase());
-			columnNames=io.loadColumnNames(io.getCurrentDatabase());
-			createMainWindow();
+		String currentDB = io.getCurrentDatabase();
+		if (currentDB!=null) {
+			if (!currentDB.equals("null")) {
+				db.selectDatabase(currentDB);
+				columnNames=io.loadColumnNames(currentDB);
+				createMainWindow();
+			}
+			else {
+				dbSelectionMenu();
+			}
 		}
 		else {
 			dbSelectionMenu();
@@ -203,6 +210,10 @@ public class GUI extends JFrame{
 	//create menu to select or create DB
 	private void dbSelectionMenu() {
 		JFrame dbSelectFrame = new JFrame("Select DB");
+		//Set Exit on close if this is the only window open
+		if (!this.isVisible()) {
+			dbSelectFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		}
 		dbSelectFrame.setSize(200, 300);
 		JPanel dbSelectionPanel=new JPanel();
 		dbSelectFrame.add(dbSelectionPanel);
@@ -210,9 +221,11 @@ public class GUI extends JFrame{
 		
 
 		//Get current DB list and select current DB
+		
 		JComboBox<String> dbList=new JComboBox<String>(db.listDatabase());
 		JButton accept=new JButton("Select DB");
 		accept.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
+			
 			db.selectDatabase(String.valueOf(dbList.getSelectedItem()));
 			io.setCurrentDatabase(String.valueOf(dbList.getSelectedItem()));
 			columnNames=io.loadColumnNames(io.getCurrentDatabase());
@@ -223,7 +236,6 @@ public class GUI extends JFrame{
 			dbSelectFrame.dispose();
 		}
 		});
-		
 		
 		JTextField nameBox=new JTextField("DB Name");
 		
@@ -260,10 +272,13 @@ public class GUI extends JFrame{
 		});
 		
 		//add Objects to GUI
-		dbSelectionPanel.add(dbList);
-		dbSelectionPanel.add(accept);
+		if (db.listDatabase().length!=0) {
+			dbSelectionPanel.add(dbList);
+			dbSelectionPanel.add(accept);
+		}
 		dbSelectionPanel.add(addDB);
 		dbSelectionPanel.add(nameBox);
+		dbSelectFrame.pack();
 		dbSelectFrame.setVisible(true);
 	}
 

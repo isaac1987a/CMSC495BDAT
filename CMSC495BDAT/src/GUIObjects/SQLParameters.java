@@ -2,6 +2,7 @@
  * SQLParameters
  * By Isaac Blach
  * Used to display search parameters to send to the SQL DB.
+ * 29 Feb 2020
  */
 
 package GUIObjects;

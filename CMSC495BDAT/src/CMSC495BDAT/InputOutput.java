@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,8 +42,6 @@ import java.util.Vector;
 import GUIObjects.ComboItem;
 import GUIObjects.ComboItemDualString;
 import GUIObjects.SearchOption;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 
 public class InputOutput {
 
@@ -68,6 +68,8 @@ public class InputOutput {
     public String[] parseFile(File file, String dbName) {
 
         try {
+            // Check if File is CSV
+            this.checkFileType(file);
 
             String line;
             count = 0;
@@ -328,8 +330,11 @@ public class InputOutput {
     public void exportDB(double[][] valuesDatabase, File selectedFile) {
         
         try {
-            StringBuilder sb = new StringBuilder();
+            // Check if Save File is CSV
+            this.checkFileType(selectedFile);
             
+            // Create or Overwrite CSV File
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < valuesDatabase.length; i++) {
                 for (int j = 0; j < valuesDatabase[i].length; j++) {
                     sb.append(valuesDatabase[i][j]+"");
@@ -391,4 +396,29 @@ public class InputOutput {
             System.out.println("Failed to delete the file");
         }
     }
+    
+        /**
+     * Checks if User Chosen File Type is CSV
+     * 
+     * @param file File
+     * @throws mainds.InputOutput.InvalidFileTypeException
+     */
+    private void checkFileType(File file) throws InvalidFileTypeException {
+        String fileName = file.getAbsolutePath();
+        String fileType = fileName.substring(fileName.length() - 4);
+        if (!fileType.equals(".csv")) {
+            throw new InvalidFileTypeException("Invalid File Type.");
+        }
+    }
+    
+    /**
+     * Custom Exception to Handle Incorrect File Type
+     */
+    private class InvalidFileTypeException extends Exception {
+
+        public InvalidFileTypeException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+    
 }

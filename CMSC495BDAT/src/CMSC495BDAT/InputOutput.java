@@ -3,17 +3,25 @@ package CMSC495BDAT;
 
 /*  File: InputOutput.java
     Author: Adam Rittermann
-    Date: 19 February 2020
-    Purpose:  CSV Parser. Passes values to SQL for storage. Returns
-            Min/Max values for each column. Stores current DB Name
-            for Last State Load */
+    Date: 28 February 2020
+    Purpose: I/O class. Parses Chosen CSV file for Database Storage.
+    Stores Current Database Name and retains a Search History.
+    Exports Selected Database Data to File. */
 
  /* Public Methods
     parseFile(File file, String dbName): String[] parseInfo;
-    getCurrentDatabase(): String dbName;
     setCurrentDatabase(String dbName): void;
-    loadColumnNames(String dbName): String[] dbSummary;
+    getCurrentDatabase(): String dbName;
+    loadColumnNames(String dbName): ComboItemDualString[] loadColumnNames
+    saveSearch(Vector<SearchOption> searchOptions, int id): void
+    loadSearch(String dbName, int id): Vector<SearchOption> searchOptions
+    loadFile(String dbName, String fileType): Object
+    exportDB(double[][] valuesDatabase, File selectedFile): void
+    updateSearchHistory(Vector<ComboItem> searchHistoryVector): void
+    getSearchHistory(): Vector<ComboItem>
+    removeSearch(int key): void
  */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -33,6 +40,8 @@ import java.util.Vector;
 import GUIObjects.ComboItem;
 import GUIObjects.ComboItemDualString;
 import GUIObjects.SearchOption;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 public class InputOutput {
 
@@ -189,7 +198,7 @@ public class InputOutput {
             String currentDB = fileReader.readLine();
             return currentDB;
         } catch (FileNotFoundException fnf) {
-        	System.out.println("DB File Not Found");
+            System.out.println("DB File Not Found");
             System.out.println("ERROR: No Current Database. Creating File...");
             this.setCurrentDatabase("");
             return null;
@@ -204,21 +213,23 @@ public class InputOutput {
      * Saves Summary Information to CSV File in DB Folder
      */
     private void saveColumnNames(String dbName) {
-        ArrayList<ComboItemDualString> contentsArray = new ArrayList<ComboItemDualString>();
+        ArrayList<ComboItemDualString> contentsArray = 
+                new ArrayList<ComboItemDualString>();
 
         String fileName = "Summary.csv";
 
-        // Headers for Summary Info
-        //contentsArray.add("Column, Min, Max");
-
         // Contents of Summary Info
         for (int i = 0; i < headers.length; i++) {
-            contentsArray.add(new ComboItemDualString(headers[i], minValues[i] + "-" + maxValues[i]));
+            contentsArray.add(new ComboItemDualString(headers[i], minValues[i] 
+                    + "-" + maxValues[i]));
         }
-        ComboItemDualString[] comboItemArray=new ComboItemDualString[contentsArray.size()];
-        comboItemArray=contentsArray.toArray(comboItemArray);
+        
+        ComboItemDualString[] comboItemArray 
+                = new ComboItemDualString[contentsArray.size()];
+        comboItemArray = contentsArray.toArray(comboItemArray);
         this.createFile(dbName, fileName, comboItemArray);
     }
+
     /**
      * Loads any previously created CSV Summary file that contains column names
      * with min and max values
@@ -227,221 +238,157 @@ public class InputOutput {
      * @return ComboItemDualString[] of "Column Min-Max" values
      */
     public ComboItemDualString[] loadColumnNames(String dbName) {
-    	return (ComboItemDualString[]) loadFile(dbName, "Summary.csv");
-    }
-
-        // Using Arraylist because initial size is unknown
-        /*ArrayList<String> list = new ArrayList<>();
-
-        try {
-            String line;
-
-            File file = new File(dbName + "\\" + dbName + "Summary.csv");
-            fileReader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(file), "UTF-8"));
-
-            /* Get rid of UTF-8 BOM issue for bug #2. -sdr */
-            /*fileReader.mark(1);
-            if (fileReader.read() != 0xFEFF) {
-                fileReader.reset();
-            }
-
-            // Skip first line of headers
-            fileReader.readLine();
-
-            // First item is current DBName
-            list.add(dbName);
-
-            // Parse CSV Summary File, assumes Column Name, Min, Max (3 vars)
-            while ((line = fileReader.readLine()) != null) {
-                String[] tempArray = line.split(DELIMITER);
-                String tempStr = tempArray[0] + " " + tempArray[1]
-                        + "-" + tempArray[2];
-                list.add(tempStr);
-            }
-        } catch (IOException ioe) {
-            System.out.println("ERROR: " + ioe);
-        }
-
-        // Convert ArrayList to ComboItemDualString[]
-        ComboItemDualString[] dbSummary = new ComboItemDualString[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            dbSummary[i] = new ComboItemDualString(list.get(i), Integer.toString(i));
-        }
-	    
-        return dbSummary;
+        return (ComboItemDualString[]) loadFile(dbName, "Summary.csv");
     }
 
     /**
-     * Save Searches as CSV File for Future Reference
+     * Save Search Options as SSV File for Future Reference
      *
-     * @param searchOptions Vector
-     * @param id int key id
+     * @param searchOptions Vector<SearchOption>
+     * @param id int search ID
      */
     public void saveSearch(Vector<SearchOption> searchOptions, int id) {
 
         String dbName = this.getCurrentDatabase();
         String fileType = id + ".ssv";
         this.createFile(dbName, fileType, searchOptions);
-        /*String col;
-        String col2;
-        ComboItem searchType;
-        String searchValue;
-        String searchKey;
-
-        String[] fileContents = new String[1];
-
-        // Separate each SearchOption into parts, save in CSV
-        col = searchOptions.getColumns().getColumnName();    // first string of comboitem
-        col2 = searchOptions.getColumns().getMinMax();       // second string of comboitem
-        searchType = searchOptions.getSearchType;            // get SearchType
-        searchValue = searchType.getValue();                 // string of search type
-        searchKey = searchType.getKey();                     // int of search type
-            
-        fileContents[0] = col + "," + col2 + "," + searchValue 
-                + "," + searchKey;
-        
-        this.createFile(dbName, fileType, fileContents);*/
     }
 
     /**
-     * Loads Search from CSV File.
+     * Loads Past Search from SSV File
      *
      * @param dbName String Database Name
-     * @param id int search id
-     * @return String thisSearch search to be loaded
+     * @param id int search ID
+     * @return Vector<SearchOption> Object containing search options
      */
     public Vector<SearchOption> loadSearch(String dbName, int id) {
-    	Object obj = loadFile(dbName, id + ".ssv");
-    	if (obj==null) {
-    		return null;
-    	}
-    	else {
-    		return (Vector<SearchOption>)obj;
-    	}
-        // Pull Previous Search from Text File if Exists
-        /*try {
-            fileReader = new BufferedReader(new FileReader(dbName + "\\"
-                    + dbName + id + ".csv"));
-            String line = fileReader.readLine();
-            String[] tempArray = line.split(DELIMITER);
-            
-            String col = tempArray[0];
-            String col2 = tempArray[1];
-            String searchValue = tempArray[2];
-            String tempKey = tempArray[3];
-            int searchKey = Integer.parseInt(tempKey);
-            
-            ComboItemDualString[] columns = new ComboItemDualString(col, col2);
-            ComboItem[] searchType = new ComboItem(searchValue, searchKey);
-            
-            SearchOption searchOptions = new SearchOption(columns, searchType);
-            return searchOptions;
-            
-        } catch (FileNotFoundException fnf) {
-            System.out.println("ERROR: No search found with that name.");
+        Object obj = loadFile(dbName, id + ".ssv");
+        if (obj == null) {
             return null;
-        } catch (IOException ioe) {
-            System.out.println("ERROR: " + ioe);
+        } else {
+            return (Vector<SearchOption>) obj;
         }
-        // Return Null if File not Found
-        return null;*/
     }
 
     /**
-     * Support Method to Create Files in their Respective Directory
+     * Support Method to Create Various Files in Database Directory
      *
      * @param dbName String Database Name
-     * @param fileType String File Name (e.g. "Summary.csv", ".txt", etc)
-     * @param fileContents String[] File Contents
+     * @param fileType String File Type
+     * @param outputObject Object to be stored
      */
-    /*private void createFile(String dbName, String fileType,
-            String[] fileContents) {
-        try (PrintWriter pw = new PrintWriter(dbName + "\\" + dbName
-                + fileType)) {
-            for (String fileContent : fileContents) {
-                pw.println(fileContent);
-            }
+    private void createFile(String dbName, String fileType,
+            Object outputObject) {
+        try {
+            FileOutputStream fs = new FileOutputStream(dbName + "\\" + fileType, false);
+            ObjectOutputStream out = new ObjectOutputStream(fs);
+            out.writeObject(outputObject);
+            out.close();
+            fs.close();
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
         }
-    }*/
-    
-    private void createFile(String dbName, String fileType,
-    	Object outputObject) {
-    	try {
-        	FileOutputStream fs = new FileOutputStream(dbName + "\\"+fileType, false);
-        	ObjectOutputStream out = new ObjectOutputStream(fs);
-        	out.writeObject(outputObject);
-        	out.close();
-        	fs.close();
-    	}
-    	catch(IOException ioe) {
-    		System.out.println("ERROR: " + ioe);
-    	}
     }
-    
-    public Object loadFile(String dbName, String fileType)  {
-    	Object obj=new Object();
-    	//Check if the file exists
-    	File file = new File(dbName + "\\"+fileType);
-    	if (!file.exists()) {
-    		return null;
-    	}
-    	try {
-    		FileInputStream fs = new FileInputStream(dbName + "\\"+fileType);
-    		ObjectInputStream in = new ObjectInputStream(fs);
-    		obj=in.readObject();
-    		in.close();
-    		fs.close();
-    	}
-    	catch(FileNotFoundException fne) {
-    		return null;
-    	} catch (IOException ioe) {
-    		System.out.println("ERROR: " + ioe);
-		} catch (ClassNotFoundException cnfe) {
-			System.out.println("ERROR: " + cnfe);
-		}
-    	return obj;
+
+    /**
+     * Support Method to Load Data Files
+     *
+     * @param dbName String Database Name
+     * @param fileType String File Type
+     * @return Object Containing File Data
+     */
+    public Object loadFile(String dbName, String fileType) {
+        Object obj = new Object();
+        //Check if the file exists
+        File file = new File(dbName + "\\" + fileType);
+        if (!file.exists()) {
+            return null;
+        }
+        try {
+            FileInputStream fs = new FileInputStream(dbName + "\\" + fileType);
+            ObjectInputStream in = new ObjectInputStream(fs);
+            obj = in.readObject();
+            in.close();
+            fs.close();
+        } catch (FileNotFoundException fne) {
+            return null;
+        } catch (IOException | ClassNotFoundException exc) {
+            System.out.println("ERROR: " + exc);
+        }
+        return obj;
     }
-  
-	//Export DB Feature.  Save the DB to a new file or overwrite a file with the selected file
-	public void exportDB(double[][] valuesDatabase, File selectedFile) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	//Have a persistant file that gets overwritten each time this is called.  This will be a vector with the names and keys
-	//Associate with current DB
-	public void updateSearchHistory(Vector<ComboItem> searchHistoryVector) {
-		createFile(this.getCurrentDatabase(), "SearchHistory.shi", searchHistoryVector);
-	}
-	//Load the persistant search history file for the currently selected DB
-	public Vector<ComboItem> getSearchHistory() {
-		Object obj = loadFile(this.getCurrentDatabase(), "SearchHistory.shi");
-    	if (obj==null) {
-    		return null;
-    	}
-    	else {
-    		try {
-    			return Vector.class.cast(obj);
-    		}
-    		catch(Exception e) {
-    			return null;
-    		}	
-    	}
-	}
 
-	//Delte the search history file associated with the key on the current DB
-		public void removeSearch(int key) {
-			File file = new File(this.getCurrentDatabase()+"\\"+key+".ssv");
-			if (file.delete())
-				System.out.println("File deleted successfully"); 
-			else
-				System.out.println("Failed to delete the file"); 
-	
-			
-		
-	}
+    
+    /**
+     * Exports DB Data to CSV File
+     * 
+     * @param valuesDatabase double[][] containing DB Data
+     * @param selectedFile File Selected Save File
+     */
+    public void exportDB(double[][] valuesDatabase, File selectedFile) {
+        
+        try {
+            StringBuilder sb = new StringBuilder();
+            
+            for (double[] valuesDatabase1 : valuesDatabase) {
+                for (int j = 0; j < valuesDatabase1.length; j++) {
+                    sb.append(valuesDatabase1[j]+"");
+                    if (j < valuesDatabase1.length - 1) {
+                        sb.append(",");
+                    }
+                }
+                sb.append("\n");
+            }
+            BufferedWriter bw = new BufferedWriter(new FileWriter(
+                    selectedFile.getAbsolutePath(), false));
+            bw.write(sb.toString());
+            bw.close();
+        } catch (IOException ioe) {
+            System.out.println("ERROR: " + ioe);
+        }   
+    }
 
+    
+    /**
+     * Creates or Overrides the Persistent Search History File that includes
+     * Historical Search Options and IDs for Current DB
+     *
+     * @param searchHistoryVector Vector of Search Options and Keys
+     */
+    public void updateSearchHistory(Vector<ComboItem> searchHistoryVector) {
+        createFile(this.getCurrentDatabase(), "SearchHistory.shi", searchHistoryVector);
+    }
+
+    /**
+     * Loads the Persistent Search History File for Current DB
+     *
+     * @return Vector Search History and IDs
+     */
+    public Vector<ComboItem> getSearchHistory() {
+        Object obj = loadFile(this.getCurrentDatabase(), "SearchHistory.shi");
+        if (obj == null) {
+            return null;
+        } else {
+            try {
+                return Vector.class.cast(obj);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Deletes the Search History File Associated with the Search ID Key for the
+     * Current DB
+     *
+     * @param key int Search ID
+     */
+    public void removeSearch(int key) {
+        File file = new File(this.getCurrentDatabase() + "\\" + key + ".ssv");
+        if (file.delete()) {
+            System.out.println("File deleted successfully");
+        } else {
+            System.out.println("Failed to delete the file");
+        }
+    }
 }

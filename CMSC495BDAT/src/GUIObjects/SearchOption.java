@@ -44,7 +44,10 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 	private Vector <SQLParameters> parametersVector;
 	private Vector <JPanel> addSubPanelVector;
 	private ComboItem searchType;
-
+	private GridBagConstraints c = new GridBagConstraints();
+	
+	private double[] dataSet1;
+	private double[] dataSet2;
 
 	public SearchOption(ComboItemDualString[] columns, int layerNumber , String option, ComboItem searchType) {
 		addSubPanelVector = new Vector<JPanel>();
@@ -67,8 +70,6 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 	//Creates the horisontal bar with search data on it
 	private void createSearchBar(int layerNumber , String option) {
 		//JPanel searchTypePanel=new JPanel();
-		
-		GridBagConstraints c = new GridBagConstraints();
 		c.fill=(GridBagConstraints.HORIZONTAL);
 		//BoxLayout boxLayout=new BoxLayout(searchTypePanel, BoxLayout.X_AXIS);
 		
@@ -181,44 +182,51 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 		c.weighty=.5;
 		c.gridx=0;
 		c.gridy=0;
-		addSubPanel.add(addButton);
+		addSubPanel.add(addButton,c);
 		
 		//add the delete button
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weighty=.5;
 		c.gridx=0;
 		c.gridy=GridBagConstraints.RELATIVE;
-		addSubPanel.add(delButton);
+		addSubPanel.add(delButton,c);
 		
-		//add this panel to a vector for deletion as needed
-		addSubPanelVector.add(addSubPanel);
 		return addSubPanel;
 	}
 	
 	//add a parametersVector line and a set of add/delete buttons
 	private void addParameter() {
 		//Create Random Key Value
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints d = new GridBagConstraints();
 		Random rand = new Random();
 		int i=rand.nextInt();
 		
-		GridBagConstraints c = new GridBagConstraints();
+		
 		//add the discriminator Panel
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx=2.0;
-		c.gridx=0;
-		c.gridy=GridBagConstraints.RELATIVE;
-		c.gridwidth=3;
+		d.fill = GridBagConstraints.HORIZONTAL;
+		d.weightx=2.0;
+		d.gridx=0;
+		d.gridy=0;
+		d.gridwidth=4;
 		parametersVector.add(new SQLParameters(columns, i));
-		add(parametersVector.get(parametersVector.size()-1),c);
+		panel.add(parametersVector.get(parametersVector.size()-1),d);
 		
 		//add the addition/removal panel
-		c.weightx=.1;
-		c.gridwidth=1;
-		c.gridx=GridBagConstraints.RELATIVE;
-		c.gridwidth=1;
-		//c.gridx=GridBagConstraints.RELATIVE;
-		c.gridy=parametersVector.size();
-		add(createAddSubPanel(i), c);
+		d.weightx=.1;
+		d.gridwidth=1;
+		d.gridx=GridBagConstraints.RELATIVE;
+		d.gridwidth=1;
+		panel.add(createAddSubPanel(i), d);
+		
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridy=GridBagConstraints.RELATIVE;
+		c.gridx=0;
+		c.gridwidth=GridBagConstraints.REMAINDER;
+		addSubPanelVector.add(panel);
+		add(panel, c);
 	}
 	
 	//Action Performed for Delete Button
@@ -302,5 +310,17 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 	}
 	public CurveOptionEnum getOption() {
 		return CurveOptionEnum.valueOf(additionalOptionBox.getSelectedItem().toString());
+	}
+	public double[] getDataset1() {
+		return dataSet1;
+	}
+	public double[] getDataset2() {
+		return dataSet2;
+	}
+	public void setDataSet1(double[] data) {
+		dataSet1=data;
+	}
+	public void setDataSet2(double[] data) {
+		dataSet2=data;
 	}
 }

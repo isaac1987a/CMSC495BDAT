@@ -30,6 +30,7 @@ import javax.swing.JTextField;
 
 import GUIObjects.ComboItem;
 import GUIObjects.ComboItemDualString;
+import GUIObjects.SQLParameters;
 import GUIObjects.SearchOption;
 
 public class GUI extends JFrame{
@@ -46,6 +47,7 @@ public class GUI extends JFrame{
 	//3 = Triple axis displays
 	private ComboItem[] types = {new ComboItem("Tabular", 0), new ComboItem("Histogram", 1), new ComboItem("Scatter Plot", 2)}; 
 	private JComboBox<ComboItem> searchSelectorBox=new JComboBox<ComboItem>(types);
+	private Vector<JPanel> addSubPanelVector = new Vector<JPanel>();
 	private JPanel searchPanel=new JPanel();
 	private JButton searchButton= new JButton("Search");
 	private JComboBox<ComboItem> searchHistoryComboBox = new JComboBox<ComboItem>();
@@ -128,7 +130,8 @@ public class GUI extends JFrame{
 		
 		
 		//Add Search Grid
-		searchOptions.add(new SearchOption(columnNames, 0, "nowhere", (ComboItem)searchSelectorBox.getSelectedItem()));
+		//searchOptions.add(new SearchOption(columnNames, searchOptions.size(), "nowhere", (ComboItem)searchSelectorBox.getSelectedItem()));
+		addSearchOption(searchPanel);
 		c.fill = GridBagConstraints.VERTICAL;
 		c.weightx=1;
 		c.gridx=0;
@@ -340,5 +343,97 @@ public class GUI extends JFrame{
 		searchSelectorBox.setSelectedItem(searchOptions.get(0).getSearchType());
 		createMainWindow();
 	}
+	private JPanel createAddSubPanel(int i) {
 		
+		//Create the add button
+		JButton addButton=new JButton("+");
+		addButton.setActionCommand(Integer.toString(i));
+		addButton.setForeground(Color.GREEN);
+		addButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {
+			addSearchOption(searchPanel);
+				revalidate();
+				repaint();
+			}
+		});
+		//Create the Delete Button
+		JButton delButton=new JButton("-");
+		delButton.setActionCommand(Integer.toString(i));
+		delButton.setForeground(Color.RED);
+		//delButton.addActionListener(this);
+		
+		//Create panel and add buttons
+		JPanel addSubPanel=new JPanel();
+		addSubPanel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+
+		//Add the addbutton
+		c.fill = GridBagConstraints.VERTICAL;
+		c.weighty=.5;
+		c.gridx=0;
+		c.gridy=0;
+		addSubPanel.add(addButton,c);
+		
+		//add the delete button
+		c.fill = GridBagConstraints.VERTICAL;
+		c.weighty=.5;
+		c.gridx=0;
+		c.gridy=GridBagConstraints.RELATIVE;
+		addSubPanel.add(delButton,c);
+		
+		return addSubPanel;
+	}
+	
+	//add a parametersVector line and a set of add/delete buttons
+	private void addSearchOption(JPanel hostPanel) {
+		//Create Random Key Value
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints d = new GridBagConstraints();
+		Random rand = new Random();
+		int i=rand.nextInt();
+		
+		
+		//add the discriminator Panel
+		d.fill = GridBagConstraints.HORIZONTAL;
+		d.weightx=2.0;
+		d.gridx=0;
+		d.gridy=0;
+		d.gridwidth=GridBagConstraints.REMAINDER;
+		searchOptions.add(new SearchOption(columnNames, searchOptions.size(), "nowhere", (ComboItem)searchSelectorBox.getSelectedItem()));
+		panel.add(searchOptions.get(searchOptions.size()-1),d);
+		
+		//add the addition/removal panel
+		d.weightx=.1;
+		d.gridwidth=1;
+		d.gridx=GridBagConstraints.RELATIVE;
+		d.gridwidth=1;
+		panel.add(createAddSubPanel(i), d);
+		
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridy=GridBagConstraints.RELATIVE;
+		c.gridx=0;
+		addSubPanelVector.add(panel);
+		hostPanel.add(panel, c);
+	}
+	
+	//Action Performed for Delete Button
+	/*@Override
+	public void actionPerformed(ActionEvent e) {
+		if (parametersVector.size()>1) {
+			//iterate through the parametersVector to find the correct one then remove and delete it and its associated object
+			for (int i=0; i<parametersVector.size(); i++) {
+				if (Integer.parseInt(e.getActionCommand())==parametersVector.get(i).objectNumber){
+					this.remove(parametersVector.get(i));
+					this.remove(addSubPanelVector.get(i));
+					parametersVector.remove(i);
+					addSubPanelVector.remove(i);
+				}
+			
+			revalidate();
+			repaint();
+			}	
+		}
+	}*/
+	
 }

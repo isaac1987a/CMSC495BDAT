@@ -120,7 +120,7 @@ public class InputOutput {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println("ERROR: File Not Found.");
+            //System.out.println("ERROR: File Not Found.");
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
         } //catch (InvalidFileTypeException ift) {
@@ -133,9 +133,9 @@ public class InputOutput {
         }
 
         /* --------------- FOR TESTING --------------- */
-        System.out.println("Min Values: " + Arrays.toString(minValues));
+        /*System.out.println("Min Values: " + Arrays.toString(minValues));
         System.out.println("Max Values: " + Arrays.toString(maxValues));
-        System.out.println(Arrays.toString(parseInfo));
+        System.out.println(Arrays.toString(parseInfo));*/
         /* --------------- FOR TESTING --------------- */
 
         // Save Summary Data to CSV File
@@ -204,8 +204,8 @@ public class InputOutput {
             String currentDB = fileReader.readLine();
             return currentDB;
         } catch (FileNotFoundException fnf) {
-            System.out.println("DB File Not Found");
-            System.out.println("ERROR: No Current Database. Creating File...");
+            //System.out.println("DB File Not Found");
+            //System.out.println("ERROR: No Current Database. Creating File...");
             this.setCurrentDatabase("");
             return null;
         } catch (IOException ioe) {
@@ -395,9 +395,9 @@ public class InputOutput {
     public void removeSearch(int key) {
         File file = new File(this.getCurrentDatabase() + "\\" + key + ".ssv");
         if (file.delete()) {
-            System.out.println("File deleted successfully");
+            //System.out.println("File deleted successfully");
         } else {
-            System.out.println("Failed to delete the file");
+           // System.out.println("Failed to delete the file");
         }
     }
     

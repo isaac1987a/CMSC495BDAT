@@ -25,9 +25,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import CMSC495BDAT.InputOutput.InvalidFileTypeException;
 import GUIObjects.ComboItem;
 import GUIObjects.ComboItemDualString;
 import GUIObjects.SearchOption;
@@ -260,7 +262,12 @@ public class GUI extends JFrame{
 			}
 			
 			//Parse File and set DB Names
-			io.parseFile(csvFile, nameBox.getText());
+			try {
+				io.parseFile(csvFile, nameBox.getText());
+			}
+			catch (InvalidFileTypeException e) {
+				 JOptionPane.showMessageDialog(dbSelectFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
 			db.selectDatabase(io.getCurrentDatabase());
 			columnNames=io.loadColumnNames(io.getCurrentDatabase());
 			createMainWindow();

@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 
+import CMSC495BDAT.InputOutput.InvalidFileTypeException;
 import GUIObjects.ComboItem;
 import GUIObjects.ComboItemDualString;
 import GUIObjects.SearchOption;
@@ -64,8 +65,9 @@ public class InputOutput {
      * @param dbName String containing DB Name
      * @return String[] parseInfo that includes DBName followed by "Column Name,
      * Min, Max".
+     * @throws InvalidFileTypeException 
      */
-    public String[] parseFile(File file, String dbName) {
+    public String[] parseFile(File file, String dbName) throws InvalidFileTypeException {
 
         try {
             // Check if File is CSV
@@ -121,9 +123,9 @@ public class InputOutput {
             System.out.println("ERROR: File Not Found.");
         } catch (IOException ioe) {
             System.out.println("ERROR: " + ioe);
-        } catch (InvalidFileTypeException ift) {
-            System.out.println("ERROR: " + ift);
-        }
+        } //catch (InvalidFileTypeException ift) {
+            //System.out.println("ERROR: " + ift);
+        //}
 
         for (int i = 0; i < headers.length; i++) {
             parseInfo[count] = headers[i] + " " + minValues[i] + "-" + maxValues[i];
@@ -333,7 +335,7 @@ public class InputOutput {
         
         try {
             // Check if Save File is CSV
-            this.checkFileType(selectedFile);
+            //this.checkFileType(selectedFile);
             
             // Create or Overwrite CSV File
             StringBuilder sb = new StringBuilder();
@@ -416,7 +418,7 @@ public class InputOutput {
     /**
      * Custom Exception to Handle Incorrect File Type
      */
-    private class InvalidFileTypeException extends Exception {
+    public class InvalidFileTypeException extends Exception {
 
         public InvalidFileTypeException(String errorMessage) {
             super(errorMessage);

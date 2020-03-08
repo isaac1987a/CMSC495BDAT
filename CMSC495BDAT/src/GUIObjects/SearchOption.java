@@ -122,7 +122,6 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 		colorChooser2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				colorChooser2.setBackground(JColorChooser.showDialog(SearchOption.this, "Choose Background Color",colorChooser2.getBackground()));
-				
 			}
 			
 		});
@@ -217,7 +216,7 @@ public class SearchOption extends JPanel implements ActionListener, Serializable
 		c.gridx=GridBagConstraints.RELATIVE;
 		c.gridwidth=1;
 		//c.gridx=GridBagConstraints.RELATIVE;
-		c.gridy=parametersVector.size();
+		c.gridy=parametersVector.size()-1;
 		add(createAddSubPanel(i), c);
 	}
 	

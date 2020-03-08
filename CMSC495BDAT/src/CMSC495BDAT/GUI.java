@@ -68,6 +68,7 @@ public class GUI extends JFrame{
 	private void createMainWindow() {
 		setVisible(false);
 		remove(searchPanel);
+		setTitle(io.getCurrentDatabase());
 		//Reset Everything
 		searchPanel=new JPanel();
 	
